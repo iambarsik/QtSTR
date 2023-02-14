@@ -16,14 +16,26 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    addcommand.cpp \
+    addformat.cpp \
+    addmodel.cpp \
+    addvariable.cpp \
     main.cpp \
-    mainwindow.cpp
+    form.cpp
 
 HEADERS += \
-    mainwindow.h
+    addcommand.h \
+    addformat.h \
+    addmodel.h \
+    addvariable.h \
+    form.h
 
 FORMS += \
-    mainwindow.ui
+    addcommand.ui \
+    addformat.ui \
+    addmodel.ui \
+    addvariable.ui \
+    form.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

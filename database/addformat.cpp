@@ -23,6 +23,19 @@ void addformat::setData(const QStringList Objects, const QStringList Systems, bo
     ui->cbSystem->addItems(Systems);
     this->EditMode = EditMode;
     this->ID = id;
+    if(EditMode)
+        setWindowTitle("Редактирование формата");
+    else
+        setWindowTitle("Добавление формата");
+}
+
+void addformat::setCurrentData(QString name, QString title, QString object, QString system, QString description)
+{
+    ui->eName->setText(name);
+    ui->eTitle->setText(title);
+    ui->cbObject->setCurrentText(object);
+    ui->cbSystem->setCurrentText(system);
+    ui->eDescription->setText(description);
 }
 
 void addformat::on_bCancel_clicked()

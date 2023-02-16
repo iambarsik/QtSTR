@@ -20,22 +20,27 @@ SOURCES += \
     addformat.cpp \
     addmodel.cpp \
     addvariable.cpp \
+    functionsDB.cpp \
+    generator.cpp \
     main.cpp \
-    form.cpp
+    form.cpp \
+    sqlform.cpp
 
 HEADERS += \
     addcommand.h \
     addformat.h \
     addmodel.h \
     addvariable.h \
-    form.h
+    form.h \
+    sqlform.h
 
 FORMS += \
     addcommand.ui \
     addformat.ui \
     addmodel.ui \
     addvariable.ui \
-    form.ui
+    form.ui \
+    sqlform.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

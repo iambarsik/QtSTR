@@ -28,7 +28,7 @@
     </font>
    </property>
    <property name="text">
-    <string>Добавить</string>
+    <string>Сохранить</string>
    </property>
   </widget>
   <widget class="QPushButton" name="bCancel">

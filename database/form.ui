@@ -166,7 +166,7 @@
      <property name="geometry">
       <rect>
        <x>180</x>
-       <y>40</y>
+       <y>43</y>
        <width>221</width>
        <height>20</height>
       </rect>
@@ -189,7 +189,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>40</y>
+       <y>43</y>
        <width>161</width>
        <height>20</height>
       </rect>
@@ -210,7 +210,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>60</y>
+       <y>66</y>
        <width>161</width>
        <height>20</height>
       </rect>
@@ -231,7 +231,7 @@
      <property name="geometry">
       <rect>
        <x>180</x>
-       <y>60</y>
+       <y>66</y>
        <width>221</width>
        <height>20</height>
       </rect>
@@ -254,7 +254,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>80</y>
+       <y>89</y>
        <width>161</width>
        <height>20</height>
       </rect>
@@ -275,7 +275,7 @@
      <property name="geometry">
       <rect>
        <x>180</x>
-       <y>80</y>
+       <y>89</y>
        <width>221</width>
        <height>20</height>
       </rect>
@@ -298,7 +298,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>100</y>
+       <y>112</y>
        <width>161</width>
        <height>20</height>
       </rect>
@@ -319,7 +319,7 @@
      <property name="geometry">
       <rect>
        <x>180</x>
-       <y>100</y>
+       <y>112</y>
        <width>221</width>
        <height>20</height>
       </rect>
@@ -342,7 +342,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>170</y>
+       <y>200</y>
        <width>161</width>
        <height>20</height>
       </rect>
@@ -363,9 +363,9 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>190</y>
+       <y>232</y>
        <width>421</width>
-       <height>61</height>
+       <height>81</height>
       </rect>
      </property>
      <property name="font">
@@ -389,7 +389,7 @@
      <property name="geometry">
       <rect>
        <x>180</x>
-       <y>120</y>
+       <y>135</y>
        <width>221</width>
        <height>20</height>
       </rect>
@@ -412,7 +412,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>120</y>
+       <y>135</y>
        <width>161</width>
        <height>20</height>
       </rect>
@@ -440,8 +440,41 @@
      <height>22</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>Файл</string>
+    </property>
+    <addaction name="action_generate"/>
+   </widget>
+   <widget class="QMenu" name="menu_2">
+    <property name="title">
+     <string>Опции</string>
+    </property>
+    <addaction name="action_SQL"/>
+   </widget>
+   <widget class="QMenu" name="menu_3">
+    <property name="title">
+     <string>Справка</string>
+    </property>
+   </widget>
+   <addaction name="menu"/>
+   <addaction name="menu_2"/>
+   <addaction name="menu_3"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="action_SQL">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Ввод SQL запроса</string>
+   </property>
+  </action>
+  <action name="action_generate">
+   <property name="text">
+    <string>Генерация исходных кодов</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

@@ -16,6 +16,7 @@ public:
     ~addformat();
 
     void setData(const QStringList Objects, const QStringList Systems, bool EditMode = false, int id = -1);
+    void setCurrentData(QString name, QString title, QString object, QString system, QString description);
 
 signals:
     void signalAddFormat(QString,QString,QString,QString,QString);

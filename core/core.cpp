@@ -44,6 +44,19 @@ void CoreQ::popDouble(QByteArray &arr, double &variable)
     arr.remove(0,sizeof (variable));
 }
 
+void CoreQ::pushChar(char value)
+{
+    m_package.append(value);
+}
+
+void CoreQ::popChar(QByteArray &arr, char &variable)
+{
+    QByteArray c = arr.mid(0,sizeof(variable)); arr.remove(0,sizeof (variable));
+    const char *value = c.constData();
+    variable = *value;
+    delete value;
+}
+
 QByteArray CoreQ::getPackage()
 {
     m_package.clear();

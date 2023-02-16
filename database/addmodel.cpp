@@ -23,6 +23,18 @@ void addmodel::setData(const QStringList Objects, const QStringList Systems, boo
     ui->cbSystem->addItems(Systems);
     this->EditMode = EditMode;
     this->ID = id;
+    if(EditMode)
+        setWindowTitle("Редактирование модели");
+    else
+        setWindowTitle("Добавление модели");
+}
+
+void addmodel::setCurrentData(QString name, QString object, QString system, QString description)
+{
+    ui->eName->setText(name);
+    ui->cbObject->setCurrentText(object);
+    ui->cbSystem->setCurrentText(system);
+    ui->eDescription->setText(description);
 }
 
 void addmodel::on_bCancel_clicked()

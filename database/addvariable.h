@@ -16,6 +16,7 @@ public:
     ~addvariable();
 
     void setData(const QStringList Models,const QStringList Types, bool EditMode = false, int id = -1);
+    void setCurrentData(QString name, QString model, QString type, uint size, QString description);
 
 signals:
     void signalAddVariable(QString,QString,QString,uint,QString);

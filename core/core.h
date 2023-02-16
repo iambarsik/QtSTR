@@ -26,6 +26,8 @@ public:
     void popInt(QByteArray &arr, int &variable);
     QByteArray pushDouble(double value);
     void popDouble(QByteArray &arr, double &variable);
+    void pushChar(char value);
+    void popChar(QByteArray &arr, char &variable);
 
     // }
     // end methods for puck/unpack core data for network

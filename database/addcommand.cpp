@@ -21,6 +21,17 @@ void addcommand::setData(const QStringList Models, bool EditMode, int id)
     ui->cbModel->addItems(Models);
     this->EditMode = EditMode;
     this->ID = id;
+    if(EditMode)
+        setWindowTitle("Редактирование команды");
+    else
+        setWindowTitle("Добавление команды");
+}
+
+void addcommand::setCurrentData(QString name, QString model, QString description)
+{
+    ui->eName->setText(name);
+    ui->cbModel->setCurrentText(model);
+    ui->eDescription->setText(description);
 }
 
 void addcommand::on_bCancel_clicked()

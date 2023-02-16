@@ -16,6 +16,7 @@ public:
     ~addcommand();
 
     void setData(const QStringList Models, bool EditMode = false, int id = -1);
+    void setCurrentData(QString name, QString model, QString description);
 
 signals:
     void signalAddCommand(QString,QString,QString);

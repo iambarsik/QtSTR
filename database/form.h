@@ -9,11 +9,17 @@
 #include <QSqlRecord>
 #include <QStringList>
 #include <QListWidgetItem>
+#include <QMessageBox>
+#include <QSharedPointer>
+#include <QException>
+#include <QFile>
+#include <QStringList>
 
 #include "addmodel.h"
 #include "addformat.h"
 #include "addcommand.h"
 #include "addvariable.h"
+#include "sqlform.h"
 
 enum Screen {
     model,
@@ -45,6 +51,7 @@ private slots:
     void slotUpdateCommand(int id, QString name, QString model, QString description);
     void slotAddVariable(QString name, QString model, QString type, uint size, QString description);
     void slotUpdateVariable(int id, QString name, QString model, QString type, uint size, QString description);
+    void slotSQLrequest(QString execute);
 
     void on_bAdd_clicked();
 
@@ -55,6 +62,10 @@ private slots:
 
     void on_bEdit_clicked();
 
+    void on_action_SQL_triggered();
+
+    void on_action_generate_triggered();
+
 private:
     Ui::form *ui;
     Screen currentScreen;
@@ -62,14 +73,16 @@ private:
 
     QSqlDatabase db;
     QSqlQuery * m_query;
-    QSqlTableModel * m_model;
 
     QStringList getNamesListFromTable(QString tablename);
+    QString getCellFromTable(QString target, QString tablename, QString key, QString value);
     addmodel addModelForm;
     addformat addFormatForm;
     addcommand addCommandForm;
     addvariable addVariableForm;
+    sqlform sqlForm;
 
+    void createDB();
     void setWidgetInfo(QString label1, QString data1,
                        QString label2, QString data2,
                        QString label3, QString data3,
@@ -77,5 +90,13 @@ private:
                        QString label5, QString data5,
                        QString label6, QString data6,
                        QString description);
+
+    QString sProjectDir;
+    QString sDB_tag;
+
+    void generateCore();
+    //void generateModels();
+    //void generateFormats();
+    void saveCodeToFile(const QStringList code, QFile &file);
 };
 #endif // FORM_H

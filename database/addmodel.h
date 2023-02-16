@@ -17,6 +17,7 @@ public:
     ~addmodel();
 
     void setData(const QStringList Objects, const QStringList Systems, bool EditMode = false, int id = -1);
+    void setCurrentData(QString name, QString object, QString system, QString description);
 
 signals:
     void signalAddModel(QString,QString,QString,QString);

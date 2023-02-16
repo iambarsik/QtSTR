@@ -23,6 +23,19 @@ void addvariable::setData(const QStringList Models, const QStringList Types, boo
     ui->cbType->addItems(Types);
     this->EditMode = EditMode;
     this->ID = id;
+    if(EditMode)
+        setWindowTitle("Редактирование переменной");
+    else
+        setWindowTitle("Добавление переменной");
+}
+
+void addvariable::setCurrentData(QString name, QString model, QString type, uint size, QString description)
+{
+    ui->eName->setText(name);
+    ui->cbModel->setCurrentText(model);
+    ui->cbType->setCurrentText(type);
+    ui->eSize->setText(QString("%1").arg(size));
+    ui->eDescription->setText(description);
 }
 
 void addvariable::on_bAdd_clicked()

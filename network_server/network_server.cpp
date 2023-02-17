@@ -36,8 +36,9 @@ NetworkServer::~NetworkServer()
 
 void NetworkServer::addCommand(command_t command)
 {
-    qDebug() << QString("Sending command: %1 %2 %3").arg(command.code).arg(command.par1).arg(command.par2);
+    qDebug() << QString("Sending command: %1 %2 %3").arg(command.code).arg(command.par1.toInt()).arg(command.par2.toInt());
     for(auto sock : connection_set) {
+        /*
         bufferSend.clear();
         bufferSend.append((command.code >> 24) & 0xFF);
         bufferSend.append((command.code >> 16) & 0xFF);
@@ -53,6 +54,15 @@ void NetworkServer::addCommand(command_t command)
         bufferSend.append((command.par2 >> 16) & 0xFF);
         bufferSend.append((command.par2 >> 8)  & 0xFF);
         bufferSend.append((command.par2) & 0xFF);
+        */
+        bufferSend.clear();
+        bufferSend.append((command.code >> 24) & 0xFF);
+        bufferSend.append((command.code >> 16) & 0xFF);
+        bufferSend.append((command.code >> 8)  & 0xFF);
+        bufferSend.append((command.code) & 0xFF);
+        bufferSend.append(command.par1.data);
+        bufferSend.append(command.par2.data);
+
         sendMessage(sock, command_type::com_buffer);
     }
 }
@@ -150,7 +160,7 @@ void NetworkServer::readyRead() {
             socket->waitForBytesWritten(10000);
         }
 
-        if(bufferRead.length() >= 24)   {
+        if(bufferRead.length() >= 32)   {
             bool status;
             QByteArray header;
             header = bufferRead.mid(0,8);
@@ -168,20 +178,26 @@ void NetworkServer::readyRead() {
             qDebug() << "Size = " << iSize << " FrameType = " << iFrameType;
 
                 // checking for default command
-            if(iSize == 24) {
+            if(iSize == 32) {
                 QByteArray frame;
-                frame = bufferRead.mid(0,24);
+                frame = bufferRead.mid(0,32);
                 frame.remove(0,8);
 
-                bool status;
-                uint iCommand = frame.mid( 0,4).toHex().toUInt(&status,16);
-                int iPar1    = frame.mid( 4,4).toHex().toInt(&status,16);
-                int iPar2    = frame.mid( 8,4).toHex().toInt(&status,16);
-                int iTime    = frame.mid(12,4).toHex().toInt(&status,16);
-                bufferRead.remove(0, 24);                   // delete frame from buffer
+                if(frame.length() >= 24)    {                   // checking if frame is correct
+                    bool status;
+                    uint iCommand = frame.mid( 0,4).toHex().toUInt(&status,16);
 
-                qDebug() << "Input command : " << iCommand << " " << iPar1 << " " << iPar2 << " " << iTime;
-                emit signalCommandFromClient({iCommand, iPar1, iPar2, iTime});
+                    STR_PARAM p1 = STR_PARAM(frame.mid( 4,8));
+                    STR_PARAM p2 = STR_PARAM(frame.mid( 12,8));
+
+                    //int iPar1    = frame.mid( 4,4).toHex().toInt(&status,16);
+                    //int iPar2    = frame.mid( 8,4).toHex().toInt(&status,16);
+                    qint32 iTime    = frame.mid(20,4).toHex().toInt(&status,16);
+                    bufferRead.remove(0, 32);                   // delete frame from buffer
+
+                    qDebug() << "Input command : " << iCommand << " " << p1.toInt() << " " << p2.toInt() << " " << iTime;
+                    emit signalCommandFromClient({iCommand, p1, p1, iTime});
+                }
             } else {
                 // try to unpack big package
             }
@@ -251,18 +267,18 @@ void NetworkServer::sendMessage(QTcpSocket* socket, command_type type)    {
             socket->waitForBytesWritten(10000);
         break;
         case com_buffer:
-            if(bufferSend.size() == 12){
+            //if(bufferSend.size() == 12){
 
                 dataSend.clear();
                 // 8 байт - заголовок кадра
-                dataSend.append((char) 0x00);           // 1 байт - 0
-                dataSend.append((char) 0x18);           // 2 байт - текущая длинна кадра в байтах (включая размер заголовка)
-                dataSend.append((char) 0x02);           // 3 байт - идентификатор получателя
-                dataSend.append((char) 0x01);           // 4 байт - идентификатор отправителя (номер узла)
-                dataSend.append((char) 0x00);           // 5 байт - флаг кадра ( 0 - я сервер, 1 - я клинет )
-                dataSend.append((char) 0x7F);           // 6 байт - тип кадра 0
-                dataSend.append((char) 0x00);           // 7 байт - зарезервировано
-                dataSend.append((char) 0x00);           // 8 байт - зарезервировано
+                dataSend.append((char) 0x00);                       // 1 байт - 0
+                dataSend.append((char) 8 + bufferSend.size() + 4);  // 2 байт - текущая длинна кадра в байтах (размер заголовка + size + time)
+                dataSend.append((char) 0x02);                       // 3 байт - идентификатор получателя
+                dataSend.append((char) 0x01);                       // 4 байт - идентификатор отправителя (номер узла)
+                dataSend.append((char) 0x00);                       // 5 байт - флаг кадра ( 0 - я сервер, 1 - я клинет )
+                dataSend.append((char) 0x7F);                       // 6 байт - тип кадра 0
+                dataSend.append((char) 0x00);                       // 7 байт - зарезервировано
+                dataSend.append((char) 0x00);                       // 8 байт - зарезервировано
 
                 // 4 байта - модельное время команды в миллисекундах
                 bufferSend.append((char) 0x00);
@@ -276,7 +292,7 @@ void NetworkServer::sendMessage(QTcpSocket* socket, command_type type)    {
                 //dataSend[1] = (char) 0x18;     // меняем длинну кадра на 24
                 //dataSend[5] = (char) 0x7F;  // меняем тип кадра на 126
                 bufferSend.clear(); // очищаем буфер
-            }
+            //}
 
             socket->write(dataSend);
             socket->flush();

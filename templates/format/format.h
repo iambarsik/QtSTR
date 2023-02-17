@@ -14,7 +14,7 @@ public:
     FormatQ(CoreQ *core, QWidget *parent = nullptr );
     CoreQ *core;
 
-    void sendCommandToModel(uint command, int par1, int par2);
+    void sendCommandToModel(uint command, STR_PARAM par1, STR_PARAM par2, qint32 time);
 
     QTimer *format_timer;
 

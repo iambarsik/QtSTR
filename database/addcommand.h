@@ -15,12 +15,12 @@ public:
     explicit addcommand(QWidget *parent = nullptr);
     ~addcommand();
 
-    void setData(const QStringList Models, bool EditMode = false, int id = -1);
+    void setData(const QStringList Models,const QStringList Types, bool EditMode = false, int id = -1);
     void setCurrentData(QString name, QString model, QString description);
 
 signals:
-    void signalAddCommand(QString,QString,QString);
-    void signalUpdateCommand(int,QString,QString,QString);
+    void signalAddCommand(QString,QString,QString,QString,QString,QString,QString);
+    void signalUpdateCommand(int,QString,QString,QString,QString,QString,QString,QString);
 
 private slots:
     void on_bCancel_clicked();

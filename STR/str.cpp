@@ -129,7 +129,12 @@ void STR::on_pushButtonSet_clicked()
         emit stop();
         emit set();
     } else {
-        STR_client->addCommand({0x80000001, 0, 0, 0});
+        command_t com;
+        com.code = 0x80000001;
+        com.par1 = STR_PARAM((qint64)0);
+        com.par2 = STR_PARAM((qint64)0);
+        com.time = 0;
+        STR_client->addCommand(com);
     }
 }
 
@@ -138,7 +143,12 @@ void STR::on_pushButtonStart_clicked()
     if(bServerNode) {
         emit start();
     } else {
-        STR_client->addCommand({0x80000002, 0, 0, 0});
+        command_t com;
+        com.code = 0x80000002;
+        com.par1 = STR_PARAM((qint64)0);
+        com.par2 = STR_PARAM((qint64)0);
+        com.time = 0;
+        STR_client->addCommand(com);
     }
 }
 
@@ -147,7 +157,12 @@ void STR::on_pushButtonStop_clicked()
     if(bServerNode) {
         emit stop();
     } else {
-        STR_client->addCommand({0x80000003, 0, 0, 0});
+        command_t com;
+        com.code = 0x80000003;
+        com.par1 = STR_PARAM((qint64)0);
+        com.par2 = STR_PARAM((qint64)0);
+        com.time = 0;
+        STR_client->addCommand(com);
     }
 }
 

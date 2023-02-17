@@ -37,11 +37,11 @@ void F_TEST::update()
 void F_TEST::on_pushButton_clicked()
 {
     ui->textEdit->append(QString("test_var1 = %1").arg(core->get_test_var1()));
-
 }
 
 void F_TEST::on_pushButton_2_clicked()
 {
-    sendCommandToModel(core->commands.test_command7, 4, 6);
-    //emit signalCommandSended({ 0x00123, 4, 6, 0 });
+    sendCommandToModel(core->commands.test_command7,
+                       STR_PARAM(ui->ep1->text().toDouble()),
+                       STR_PARAM(ui->ep2->text().toDouble()), 0);
 }

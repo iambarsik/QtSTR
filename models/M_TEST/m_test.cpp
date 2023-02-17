@@ -50,9 +50,9 @@ void M_TEST::init()
     test_var6 = 0;
     test_var7 = 0;
     for(int i = 0; i < 1000; i++) test_arr[i] = 0;
-    test_double1 = 0.0f;
-    test_double2 = 0.0f;
-    test_double3 = 0.0f;
+    test_double1 = 0.0;
+    test_double2 = 0.0;
+    test_double3 = 0.0;
 
 
     outputToCore();
@@ -68,9 +68,9 @@ void M_TEST::set()
     test_var6 = 0;
     test_var7 = 0;
     for(int i = 0; i < 1000; i++) test_arr[i] = 0;
-    test_double1 = 0.0f;
-    test_double2 = 0.0f;
-    test_double3 = 0.0f;
+    test_double1 = 0.0;
+    test_double2 = 0.0;
+    test_double3 = 0.0;
 
 
     outputToCore();    
@@ -96,7 +96,7 @@ void M_TEST::update()
 
     test_double1 += 0.12341;
     test_double2 += 0.0123;
-    test_double3 += 0.03413;
+    test_double3 += 0.01231;
 }
 
 void M_TEST::ReadCommand(command_t command)
@@ -121,7 +121,12 @@ void M_TEST::ReadCommand(command_t command)
 
         } break;
         case test_command7: {
-            test_double3 = 111.111f;
+            double p1 = command.par1.toDouble();
+            double p2 = command.par2.toDouble();
+
+            test_double3 = p1;
+            Q_UNUSED(p1);
+            Q_UNUSED(p2);
         } break;
         default:
             qDebug() << "Unknown command in model ID = " << getID();

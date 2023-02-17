@@ -68,7 +68,7 @@ void NetworkClient::readyRead()   {
         bufferRead = socket->readAll();
         //qDebug() << bufferRead;
 
-        if(bufferRead.length() >= 24)   {
+        if(bufferRead.length() >= 32)   {
 
             bool status;
             int iPackageFlag = bufferRead.mid(0,1).toHex().toInt(&status,16);
@@ -92,20 +92,24 @@ void NetworkClient::readyRead()   {
                 qDebug() << socket->bytesAvailable();
 
                     // checking for default command
-                if(iSize == 24) {
+                if(iSize == 32) {
                     QByteArray frame;
-                    frame = bufferRead.mid(0,24);
+                    frame = bufferRead.mid(0,32);
                     frame.remove(0,8);
 
-                    if(frame.length() >= 16)    {                   // checking if frame is correct
+                    if(frame.length() >= 24)    {                   // checking if frame is correct
                         bool status;
-                        int iCommand = frame.mid( 0,4).toHex().toInt(&status,16);
-                        int iPar1    = frame.mid( 4,4).toHex().toInt(&status,16);
-                        int iPar2    = frame.mid( 8,4).toHex().toInt(&status,16);
-                        int iTime    = frame.mid(12,4).toHex().toInt(&status,16);
-                        bufferRead.remove(0, 24);                   // delete frame from buffer
+                        uint iCommand = frame.mid( 0,4).toHex().toInt(&status,16);
 
-                        qDebug() << "Input command : " << iCommand << " " << iPar1 << " " << iPar2 << " " << iTime;
+                        STR_PARAM p1 = STR_PARAM(frame.mid( 4,8));
+                        STR_PARAM p2 = STR_PARAM(frame.mid( 12,8));
+
+                        //qint64 iPar1    = frame.mid( 4,8).toHex().toInt(&status,16);
+                        //qint64 iPar2    = frame.mid( 8,8).toHex().toInt(&status,16);
+                        qint32 iTime    = frame.mid(20,4).toHex().toInt(&status,16);
+                        bufferRead.remove(0, 32);                   // delete frame from buffer
+
+                        qDebug() << "Input command : " << iCommand << " p1: " << p1.toInt() << " p2: " << p2.toInt() << " time: " << iTime;
                     }
                 } else {
                     /*
@@ -195,34 +199,34 @@ void NetworkClient::sendMessage(command_type type)   {
             socket->waitForBytesWritten(10000);
         break;
         case com_buffer:
-            if(bufferSend.size() == 12){
+            //if(bufferSend.size() == 12){
                 dataSend.clear();
                     // 8 байт - заголовок кадра
-                dataSend.append((char) 0x00);           // 1 байт - 0
-                dataSend.append((char) 0x18);           // 2 байт - текущая длинна кадра в байтах (включая размер заголовка)
-                dataSend.append((char) 0x02);           // 3 байт - идентификатор получателя
-                dataSend.append((char) 0x01);           // 4 байт - идентификатор отправителя (номер узла)
-                dataSend.append((char) 0x01);           // 5 байт - флаг кадра ( 0 - я сервер, 1 - я клинет )
-                dataSend.append((char) 0x7F);           // 6 байт - тип кадра 0
-                dataSend.append((char) 0x00);           // 7 байт - зарезервировано
-                dataSend.append((char) 0x00);           // 8 байт - зарезервировано
+                dataSend.append((char) 0x00);                       // 1 байт - 0
+                dataSend.append((char) 8 + bufferSend.size() + 4);  // 2 байт - текущая длинна кадра в байтах (размер заголовка + size + time)
+                dataSend.append((char) 0x02);                       // 3 байт - идентификатор получателя
+                dataSend.append((char) 0x01);                       // 4 байт - идентификатор отправителя (номер узла)
+                dataSend.append((char) 0x01);                       // 5 байт - флаг кадра ( 0 - я сервер, 1 - я клинет )
+                dataSend.append((char) 0x7F);                       // 6 байт - тип кадра 0
+                dataSend.append((char) 0x00);                       // 7 байт - зарезервировано
+                dataSend.append((char) 0x00);                       // 8 байт - зарезервировано
 
                     // 4 байта - модельное время команды в миллисекундах
                 bufferSend.append((char) 0x00);
                 bufferSend.append((char) 0x00);
                 bufferSend.append((char) 0x00);
-                bufferSend.append((char) 0x03);
+                bufferSend.append((char) 0x00);
 
                 dataSend.append(bufferSend);
 
-                //qDebug() << "Length: " << dataSend.length();
+                qDebug() << "Length: " << dataSend.length();
 
                 bufferSend.clear(); // очищаем буфер
 
                 socket->write(dataSend);
                 socket->flush();
                 socket->waitForBytesWritten(10000);
-            }
+            //}
         break;
         case command_type::com_package:
 
@@ -232,7 +236,7 @@ void NetworkClient::sendMessage(command_type type)   {
 
 
 void NetworkClient::addCommand(command_t command)  {
-
+    /*
     bufferSend.clear();
     bufferSend.append((command.code >> 24) & 0xFF);
     bufferSend.append((command.code >> 16) & 0xFF);
@@ -248,8 +252,19 @@ void NetworkClient::addCommand(command_t command)  {
     bufferSend.append((command.par2 >> 16) & 0xFF);
     bufferSend.append((command.par2 >> 8)  & 0xFF);
     bufferSend.append((command.par2) & 0xFF);
+    */
 
-    qDebug() << QString("Command is sent: %1 %2 %3").arg(command.code).arg(command.par1).arg(command.par2);
+    bufferSend.clear();
+    bufferSend.append((command.code >> 24) & 0xFF);
+    bufferSend.append((command.code >> 16) & 0xFF);
+    bufferSend.append((command.code >> 8)  & 0xFF);
+    bufferSend.append((command.code) & 0xFF);
+    bufferSend.append(command.par1.data);
+    bufferSend.append(command.par2.data);
+
+
+
+    qDebug() << QString("Command is sent: %1 %2 %3").arg(command.code).arg(command.par1.toInt()).arg(command.par2.toInt());
     sendMessage(command_type::com_buffer);
 }
 

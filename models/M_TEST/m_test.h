@@ -31,15 +31,15 @@ public:
     void ReadCommand(command_t command) override;
 
 private:
-    qint32 test_var1;
-    qint32 test_var2;
-    qint32 test_var3;
-    qint32 test_var4;
-    qint32 test_var5;
-    qint32 test_var6;
-    qint32 test_var7;
+    qint64 test_var1;
+    qint64 test_var2;
+    qint64 test_var3;
+    qint64 test_var4;
+    qint64 test_var5;
+    qint64 test_var6;
+    qint64 test_var7;
 
-    qint32 test_arr[1000];
+    qint64 test_arr[1000];
 
     double test_double1;
     double test_double2;

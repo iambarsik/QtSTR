@@ -87,7 +87,7 @@ void form::generateCore()
             QString description = q->value(3).toString();
 
             COMMANDS.append(sDB_tag + QString(" const uint %1 = %2;").arg(name).arg(com_id));
-            COMMANDS_CONSTRUCTOR.append(sDB_tag + QString("dependings.push_back({ %1, %2 /*%3*/, \"%4\" });").arg(name).arg(model_id).arg(model_name).arg(description));
+            COMMANDS_CONSTRUCTOR.append(sDB_tag + QString(" dependings.push_back({ %1, %2 /*%3*/, \"%4\" });").arg(name).arg(model_id).arg(model_name).arg(description));
         }
     }
 
@@ -114,38 +114,38 @@ void form::generateCore()
             QString var_unpack;
 
             if(var_size > 0)    {
-                var = QString("%1 core_%2[%3]; // %4").arg(type).arg(name).arg(size).arg(description);
-                get_method = QString("%1 get_%2(int position) { if(position < %3) return core_%2[position]; else return 0; }").arg(type).arg(name).arg(size);
-                set_method = QString("void set_%2(%1 value, int position) { if(position < %3) core_%2[position] = value; }").arg(type).arg(name).arg(size);
+                var = QString(" %1 core_%2[%3]; // %4").arg(type).arg(name).arg(size).arg(description);
+                get_method = QString(" %1 get_%2(int position) { if(position < %3) return core_%2[position]; else return 0; }").arg(type).arg(name).arg(size);
+                set_method = QString(" void set_%2(%1 value, int position) { if(position < %3) core_%2[position] = value; }").arg(type).arg(name).arg(size);
                 if(type == "qint32")    {
-                    var_constructor = QString("for(int i = 0; i < %2; i++) { core_%1[i] = 0; }").arg(name).arg(size);
-                    var_pack = QString("for(int i = 0; i < %2; i++) { pushInt(core_%1[i]); }").arg(name).arg(size);
-                    var_unpack = QString("for(int i = 0; i < %2; i++) { popInt(arr,core_%1[i]); }").arg(name).arg(size);
+                    var_constructor = QString(" for(int i = 0; i < %2; i++) { core_%1[i] = 0; }").arg(name).arg(size);
+                    var_pack = QString(" for(int i = 0; i < %2; i++) { pushInt(core_%1[i]); }").arg(name).arg(size);
+                    var_unpack = QString(" for(int i = 0; i < %2; i++) { popInt(arr,core_%1[i]); }").arg(name).arg(size);
                 } else if(type == "double") {
-                    var_constructor = QString("for(int i = 0; i < %2; i++) { core_%1[i] = 0.0f; }").arg(name).arg(size);
-                    var_pack = QString("for(int i = 0; i < %2; i++) { m_package.append(pushDouble(core_%1[i])); }").arg(name).arg(size);
-                    var_unpack = QString("for(int i = 0; i < %2; i++) { m_package.append(popDouble(arr,core_%1[i])); }").arg(name).arg(size);
+                    var_constructor = QString(" for(int i = 0; i < %2; i++) { core_%1[i] = 0.0; }").arg(name).arg(size);
+                    var_pack = QString(" for(int i = 0; i < %2; i++) { m_package.append(pushDouble(core_%1[i])); }").arg(name).arg(size);
+                    var_unpack = QString(" for(int i = 0; i < %2; i++) { m_package.append(popDouble(arr,core_%1[i])); }").arg(name).arg(size);
                 } else if(type == "char")   {
-                    var_constructor = QString("for(int i = 0; i < %2; i++) { core_%1[i] = 0; }").arg(name).arg(size);
-                    var_pack = QString("for(int i = 0; i < %2; i++) { pushChar(core_%1[i]); }").arg(name).arg(size);
-                    var_unpack = QString("for(int i = 0; i < %2; i++) { popChar(arr,core_%1[i]); }").arg(name).arg(size);
+                    var_constructor = QString(" for(int i = 0; i < %2; i++) { core_%1[i] = 0; }").arg(name).arg(size);
+                    var_pack = QString(" for(int i = 0; i < %2; i++) { pushChar(core_%1[i]); }").arg(name).arg(size);
+                    var_unpack = QString(" for(int i = 0; i < %2; i++) { popChar(arr,core_%1[i]); }").arg(name).arg(size);
                 }
             } else {
-                var = QString("%1 core_%2; // %3").arg(type).arg(name).arg(description);
-                get_method = QString("%1 get_%2() { return core_%2; }").arg(type).arg(name);
-                set_method = QString("void set_%2(%1 %2) { core_%2 = %2; }").arg(type).arg(name);
+                var = QString(" %1 core_%2; // %3").arg(type).arg(name).arg(description);
+                get_method = QString(" %1 get_%2() { return core_%2; }").arg(type).arg(name);
+                set_method = QString(" void set_%2(%1 %2) { core_%2 = %2; }").arg(type).arg(name);
                 if(type == "qint32")    {
-                    var_constructor = QString("core_%1 = 0;").arg(name);
-                    var_pack = QString("pushInt(core_%1);").arg(name);
-                    var_unpack = QString("popInt(arr,core_%1);").arg(name);
+                    var_constructor = QString(" core_%1 = 0;").arg(name);
+                    var_pack = QString(" pushInt(core_%1);").arg(name);
+                    var_unpack = QString(" popInt(arr,core_%1);").arg(name);
                 } else if(type == "double") {
-                    var_constructor = QString("core_%1 = 0.0f;").arg(name);
-                    var_pack = QString("m_package.append(pushDouble(core_%1));").arg(name);
-                    var_unpack = QString("popDouble(arr,core_%1);").arg(name);
+                    var_constructor = QString(" core_%1 = 0.0;").arg(name);
+                    var_pack = QString(" m_package.append(pushDouble(core_%1));").arg(name);
+                    var_unpack = QString(" popDouble(arr,core_%1);").arg(name);
                 } else if(type == "char")   {
-                    var_constructor = QString("core_%1 = 0;").arg(name);
-                    var_pack = QString("pushChar(core_%1);").arg(name);
-                    var_unpack = QString("popChar(arr,core_%1);").arg(name);
+                    var_constructor = QString(" core_%1 = 0;").arg(name);
+                    var_pack = QString(" pushChar(core_%1);").arg(name);
+                    var_unpack = QString(" popChar(arr,core_%1);").arg(name);
                 }
             }
 
@@ -156,7 +156,6 @@ void form::generateCore()
             VARS_CONSTRUCTOR.append(sDB_tag + var_constructor);
             VARS_PACK.append(sDB_tag + var_pack);
             VARS_UNPACK.append(sDB_tag + var_unpack);
-
         }
     }
 
@@ -314,6 +313,12 @@ void form::generateCore()
     }
 
     saveCodeToFile(generatedCode,fCode);
+
+
+
+
+
+
 
     /*
         for(int i = 0; i < generatedCode.size(); i++)    {

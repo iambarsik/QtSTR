@@ -22,7 +22,7 @@ void STR::ConnectFormat(FormatQ *format)
 void STR::slotReadCommand(command_t command)
 {
     qDebug() << "Recieved command from format";
-    qDebug() << "Command: " << command.code << ", pars: " << command.par1 << " " << command.par2;
+    qDebug() << "Command: " << command.code << ", pars: " << command.par1.toInt() << " " << command.par2.toInt();
 
     if(bServerNode) {
 

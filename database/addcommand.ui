@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>481</width>
-    <height>257</height>
+    <width>554</width>
+    <height>411</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,9 +16,9 @@
   <widget class="QLineEdit" name="eName">
    <property name="geometry">
     <rect>
-     <x>280</x>
-     <y>15</y>
-     <width>191</width>
+     <x>240</x>
+     <y>12</y>
+     <width>301</width>
      <height>31</height>
     </rect>
    </property>
@@ -32,7 +32,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>140</y>
+     <y>270</y>
      <width>191</width>
      <height>20</height>
     </rect>
@@ -52,9 +52,9 @@
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>80</x>
-     <y>22</y>
-     <width>191</width>
+     <x>10</x>
+     <y>18</y>
+     <width>221</width>
      <height>20</height>
     </rect>
    </property>
@@ -73,8 +73,8 @@
   <widget class="QPushButton" name="bAdd">
    <property name="geometry">
     <rect>
-     <x>160</x>
-     <y>210</y>
+     <x>210</x>
+     <y>340</y>
      <width>151</width>
      <height>31</height>
     </rect>
@@ -91,8 +91,8 @@
   <widget class="QPushButton" name="bCancel">
    <property name="geometry">
     <rect>
-     <x>320</x>
-     <y>210</y>
+     <x>370</x>
+     <y>340</y>
      <width>151</width>
      <height>31</height>
     </rect>
@@ -110,8 +110,8 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>170</y>
-     <width>461</width>
+     <y>300</y>
+     <width>531</width>
      <height>31</height>
     </rect>
    </property>
@@ -125,8 +125,8 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>66</y>
-     <width>261</width>
+     <y>210</y>
+     <width>221</width>
      <height>20</height>
     </rect>
    </property>
@@ -145,9 +145,9 @@
   <widget class="QComboBox" name="cbModel">
    <property name="geometry">
     <rect>
-     <x>280</x>
-     <y>60</y>
-     <width>191</width>
+     <x>240</x>
+     <y>204</y>
+     <width>261</width>
      <height>31</height>
     </rect>
    </property>
@@ -155,6 +155,150 @@
     <font>
      <pointsize>12</pointsize>
     </font>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="cbPar1Type">
+   <property name="geometry">
+    <rect>
+     <x>240</x>
+     <y>53</y>
+     <width>131</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="cbPar2Type">
+   <property name="geometry">
+    <rect>
+     <x>240</x>
+     <y>130</y>
+     <width>131</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_3">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>62</y>
+     <width>221</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Тип первого параметра:</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_4">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>133</y>
+     <width>221</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Тип второго параметра:</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="ePar1Com">
+   <property name="geometry">
+    <rect>
+     <x>240</x>
+     <y>89</y>
+     <width>301</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="ePar2Com">
+   <property name="geometry">
+    <rect>
+     <x>240</x>
+     <y>167</y>
+     <width>301</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_6">
+   <property name="geometry">
+    <rect>
+     <x>70</x>
+     <y>93</y>
+     <width>161</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Комментарий:</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_7">
+   <property name="geometry">
+    <rect>
+     <x>70</x>
+     <y>173</y>
+     <width>161</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Комментарий:</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
    </property>
   </widget>
  </widget>

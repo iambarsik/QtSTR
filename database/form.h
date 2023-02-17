@@ -47,8 +47,8 @@ private slots:
     void slotUpdateModel(int,QString name, QString object, QString system, QString description);
     void slotAddFormat(QString name, QString title, QString object, QString system, QString description);
     void slotUpdateFormat(int id, QString name, QString title, QString object, QString system, QString description);
-    void slotAddCommand(QString name, QString model, QString description);
-    void slotUpdateCommand(int id, QString name, QString model, QString description);
+    void slotAddCommand(QString name, QString par1_type, QString par2_type, QString par1_text, QString par2_text, QString model, QString description);
+    void slotUpdateCommand(int id, QString name, QString par1_type, QString par2_type, QString par1_text, QString par2_text, QString model, QString description);
     void slotAddVariable(QString name, QString model, QString type, uint size, QString description);
     void slotUpdateVariable(int id, QString name, QString model, QString type, uint size, QString description);
     void slotSQLrequest(QString execute);

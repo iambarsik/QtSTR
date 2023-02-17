@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>300</width>
-    <height>400</height>
+    <height>440</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -23,7 +23,7 @@
    <property name="geometry">
     <rect>
      <x>150</x>
-     <y>370</y>
+     <y>340</y>
      <width>141</width>
      <height>23</height>
     </rect>
@@ -38,7 +38,7 @@
      <x>10</x>
      <y>10</y>
      <width>281</width>
-     <height>351</height>
+     <height>321</height>
     </rect>
    </property>
   </widget>
@@ -46,13 +46,33 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>370</y>
-     <width>131</width>
+     <y>400</y>
+     <width>141</width>
      <height>23</height>
     </rect>
    </property>
    <property name="text">
     <string>Отправить команду</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="ep1">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>340</y>
+     <width>91</width>
+     <height>20</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="ep2">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>370</y>
+     <width>91</width>
+     <height>20</height>
+    </rect>
    </property>
   </widget>
  </widget>

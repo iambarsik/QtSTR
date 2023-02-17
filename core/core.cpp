@@ -9,21 +9,25 @@ CoreQ::CoreQ()
     core_test_var5 = 4;
     core_test_var6 = 5;
     core_test_var7 = 6;
-    core_test_double1 = 0.0f;
-    core_test_double2 = 0.0f;
-    core_test_double3 = 0.0f;
+    core_test_double1 = 0.0;
+    core_test_double2 = 0.0;
+    core_test_double3 = 0.0;
     for(int i = 0; i < 1000; i++)  { core_test_arr[i] = 0; }
 }
 
-void CoreQ::pushInt(qint32 value)
+void CoreQ::pushInt(qint64 value)
 {
+    m_package.append((value >> 56) & 0xFF);
+    m_package.append((value >> 48) & 0xFF);
+    m_package.append((value >> 40) & 0xFF);
+    m_package.append((value >> 32) & 0xFF);
     m_package.append((value >> 24) & 0xFF);
     m_package.append((value >> 16) & 0xFF);
     m_package.append((value >> 8)  & 0xFF);
     m_package.append((value >> 0)  & 0xFF);
 }
 
-void CoreQ::popInt(QByteArray &arr, int &variable)
+void CoreQ::popInt(QByteArray &arr, qint64 &variable)
 {
     bool ok;
     variable = arr.mid(0,sizeof(variable)).toHex().toInt(&ok,16); arr.remove(0,sizeof (variable));
@@ -95,7 +99,7 @@ void CoreQ::setCoreFromPackage(QByteArray package)
     // {
     // begin unpack system
 
-    int buff = 0;
+    qint64 buff = 0;
     popInt(arr,buff); str_system_start = (bool) buff;
 
     // end unpack system

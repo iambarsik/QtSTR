@@ -15,10 +15,14 @@ addcommand::~addcommand()
     delete ui;
 }
 
-void addcommand::setData(const QStringList Models, bool EditMode, int id)
+void addcommand::setData(const QStringList Models, const QStringList Types, bool EditMode, int id)
 {
     ui->cbModel->clear();
+    ui->cbPar1Type->clear();
+    ui->cbPar2Type->clear();
     ui->cbModel->addItems(Models);
+    ui->cbPar1Type->addItems(Types);
+    ui->cbPar2Type->addItems(Types);
     this->EditMode = EditMode;
     this->ID = id;
     if(EditMode)
@@ -51,10 +55,18 @@ void addcommand::on_bAdd_clicked()
     if(EditMode)    {
         emit signalUpdateCommand(ID,
                                  ui->eName->text(),
+                                 ui->cbPar1Type->currentText(),
+                                 ui->cbPar2Type->currentText(),
+                                 ui->ePar1Com->text(),
+                                 ui->ePar2Com->text(),
                                  ui->cbModel->currentText(),
                                  ui->eDescription->text());
     } else {
         emit signalAddCommand(ui->eName->text(),
+                              ui->cbPar1Type->currentText(),
+                              ui->cbPar2Type->currentText(),
+                              ui->ePar1Com->text(),
+                              ui->ePar2Com->text(),
                               ui->cbModel->currentText(),
                               ui->eDescription->text());
     }

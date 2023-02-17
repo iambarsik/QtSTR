@@ -55,6 +55,10 @@ void form::createDB()
     temp_query->exec("CREATE TABLE commands("
                      "id INTEGER NOT NULL UNIQUE,"
                      "name TEXT NOT NULL UNIQUE,"
+                     "par1_type TEXT NOT NULL,"
+                     "par2_type TEXT NOT NULL,"
+                     "par1_text TEXT NOT NULL,"
+                     "par2_text TEXT NOT NULL,"
                      "model TEXT NOT NULL,"
                      "description TEXT NOT NULL,"
                      "PRIMARY KEY(id AUTOINCREMENT)"
@@ -99,7 +103,7 @@ void form::createDB()
     temp_query->exec();
     temp_query->prepare("INSERT INTO variable_types (name) "
                         "VALUES (:name)");
-    temp_query->bindValue(":name", "qint32");
+    temp_query->bindValue(":name", "qint64");
     temp_query->exec();
     temp_query->prepare("INSERT INTO variable_types (name) "
                         "VALUES (:name)");
@@ -179,12 +183,16 @@ void form::slotUpdateFormat(int id, QString name, QString title, QString object,
     this->on_comboBox_tables_activated(ui->comboBox_tables->currentIndex());
 }
 
-void form::slotAddCommand(QString name, QString model, QString description)
+void form::slotAddCommand(QString name, QString par1_type, QString par2_type, QString par1_text, QString par2_text, QString model, QString description)
 {
     QSharedPointer<QSqlQuery> temp_query = QSharedPointer<QSqlQuery>(new QSqlQuery(db));
-    temp_query->prepare("INSERT INTO commands (name, model, description) "
-                        "VALUES (:name, :model, :description)");
+    temp_query->prepare("INSERT INTO commands (name, par1_type, par2_type, par1_text, par2_text, model, description) "
+                        "VALUES (:name, :par1_type, :par2_type, :par1_text, :par2_text, :model, :description)");
     temp_query->bindValue(":name", name);
+    temp_query->bindValue(":par1_type", par1_type);
+    temp_query->bindValue(":par2_type", par2_type);
+    temp_query->bindValue(":par1_text", par1_text);
+    temp_query->bindValue(":par2_text", par2_text);
     temp_query->bindValue(":model", model);
     temp_query->bindValue(":description", description);
     if(!temp_query->exec()) {
@@ -194,7 +202,7 @@ void form::slotAddCommand(QString name, QString model, QString description)
     this->on_comboBox_tables_activated(ui->comboBox_tables->currentIndex());
 }
 
-void form::slotUpdateCommand(int id, QString name, QString model, QString description)
+void form::slotUpdateCommand(int id, QString name, QString par1_type, QString par2_type, QString par1_text, QString par2_text, QString model, QString description)
 {
     QSharedPointer<QSqlQuery> temp_query = QSharedPointer<QSqlQuery>(new QSqlQuery(db));
     temp_query->prepare("UPDATE commands SET name = :name, model = :model, description = :description "

@@ -64,10 +64,10 @@ form::form(QWidget *parent)
     connect(&addFormatForm, SIGNAL(signalUpdateFormat(int,QString,QString,QString,QString,QString)),
             this, SLOT(slotUpdateFormat(int,QString,QString,QString,QString,QString)));
 
-    connect(&addCommandForm, SIGNAL(signalAddCommand(QString,QString,QString)),
-            this, SLOT(slotAddCommand(QString,QString,QString)));
-    connect(&addCommandForm, SIGNAL(signalUpdateCommand(int,QString,QString,QString)),
-            this, SLOT(slotUpdateCommand(int,QString,QString,QString)));
+    connect(&addCommandForm, SIGNAL(signalAddCommand(QString,QString,QString,QString,QString,QString,QString)),
+            this, SLOT(slotAddCommand(QString,QString,QString,QString,QString,QString,QString)));
+    connect(&addCommandForm, SIGNAL(signalUpdateCommand(int,QString,QString,QString,QString,QString,QString,QString)),
+            this, SLOT(slotUpdateCommand(int,QString,QString,QString,QString,QString,QString,QString)));
 
     connect(&addVariableForm, SIGNAL(signalAddVariable(QString,QString,QString,uint,QString)),
             this, SLOT(slotAddVariable(QString,QString,QString,uint,QString)));
@@ -181,7 +181,7 @@ void form::on_bAdd_clicked()
         break;
         case Screen::command:
             addCommandForm.setCurrentData("","","");
-            addCommandForm.setData(getNamesListFromTable("models"));
+            addCommandForm.setData(getNamesListFromTable("models"),getNamesListFromTable("variable_types"));
             addCommandForm.setModal(true);
             addCommandForm.show();
         break;
@@ -348,7 +348,7 @@ void form::on_bEdit_clicked()
             addVariableForm.show();
         break;
         case Screen::command:
-            addCommandForm.setData(getNamesListFromTable("models"),true,currentEditID);
+            addCommandForm.setData(getNamesListFromTable("models"),getNamesListFromTable("variable_types"),true,currentEditID);
             addCommandForm.setModal(true);
             addCommandForm.show();
         break;
@@ -363,6 +363,12 @@ void form::on_action_SQL_triggered()
 
 void form::on_action_generate_triggered()
 {
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(this, "Подтверждение", "Построить исходные коды?",
+                                  QMessageBox::Yes|QMessageBox::No);
+    if (reply == QMessageBox::No)
+        return;
+
     try {
         generateCore();
     } catch (QException *e) {

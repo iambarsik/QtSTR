@@ -11,8 +11,13 @@ FormatQ::FormatQ(CoreQ *core, QWidget *parent)
     format_timer->start();
 }
 
-void FormatQ::sendCommandToModel(uint command, int par1, int par2)
+void FormatQ::sendCommandToModel(uint command, STR_PARAM par1, STR_PARAM par2, qint32 time)
 {
-    emit signalCommandSended({command, par1, par2,0});
+    command_t com;
+    com.code = command;
+    com.par1 = par1;
+    com.par2 = par2;
+    com.time = time;
+    emit signalCommandSended(com);
 }
 

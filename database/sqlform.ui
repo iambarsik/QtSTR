@@ -34,7 +34,7 @@
   <widget class="QPushButton" name="bExecute">
    <property name="geometry">
     <rect>
-     <x>490</x>
+     <x>530</x>
      <y>100</y>
      <width>131</width>
      <height>31</height>
@@ -52,7 +52,7 @@
   <widget class="QPushButton" name="bCancel">
    <property name="geometry">
     <rect>
-     <x>630</x>
+     <x>670</x>
      <y>100</y>
      <width>131</width>
      <height>31</height>

@@ -115,15 +115,15 @@ void form::createDB()
     temp_query->exec();
 }
 
-void form::slotAddModel(QString name, QString object, QString system, QString description)
+void form::slotAddModel(model_struct mod)
 {
     QSharedPointer<QSqlQuery> temp_query = QSharedPointer<QSqlQuery>(new QSqlQuery(db));
     temp_query->prepare("INSERT INTO models (name, object, system, description) "
                         "VALUES (:name, :object, :system, :description)");
-    temp_query->bindValue(":name", name);
-    temp_query->bindValue(":object", object);
-    temp_query->bindValue(":system", system);
-    temp_query->bindValue(":description", description);
+    temp_query->bindValue(":name", mod.name);
+    temp_query->bindValue(":object", mod.object);
+    temp_query->bindValue(":system", mod.system);
+    temp_query->bindValue(":description", mod.description);
     if(!temp_query->exec()) {
         QMessageBox::warning(this, "Ошибка!", "Не удалось добавить модель!", QMessageBox::Yes);
         return;
@@ -131,16 +131,16 @@ void form::slotAddModel(QString name, QString object, QString system, QString de
     this->on_comboBox_tables_activated(ui->comboBox_tables->currentIndex());
 }
 
-void form::slotUpdateModel(int id, QString name, QString object, QString system, QString description)
+void form::slotUpdateModel(model_struct mod)
 {
     QSharedPointer<QSqlQuery> temp_query = QSharedPointer<QSqlQuery>(new QSqlQuery(db));
     temp_query->prepare("UPDATE models SET name = :name, object = :object, system = :system, description = :description "
                         "WHERE id = :id");
-    temp_query->bindValue(":name", name);
-    temp_query->bindValue(":object", object);
-    temp_query->bindValue(":system", system);
-    temp_query->bindValue(":description", description);
-    temp_query->bindValue(":id", id);
+    temp_query->bindValue(":name", mod.name);
+    temp_query->bindValue(":object", mod.object);
+    temp_query->bindValue(":system", mod.system);
+    temp_query->bindValue(":description", mod.description);
+    temp_query->bindValue(":id", mod.id);
     if(!temp_query->exec()) {
         QMessageBox::warning(this, "Ошибка!", "Не удалось обновить модель!", QMessageBox::Yes);
         return;
@@ -148,16 +148,16 @@ void form::slotUpdateModel(int id, QString name, QString object, QString system,
     this->on_comboBox_tables_activated(ui->comboBox_tables->currentIndex());
 }
 
-void form::slotAddFormat(QString name, QString title, QString object, QString system, QString description)
+void form::slotAddFormat(format_struct form)
 {
     QSharedPointer<QSqlQuery> temp_query = QSharedPointer<QSqlQuery>(new QSqlQuery(db));
     temp_query->prepare("INSERT INTO formats (name, title, object, system, description) "
                         "VALUES (:name, :title, :object, :system, :description)");
-    temp_query->bindValue(":name", name);
-    temp_query->bindValue(":title", title);
-    temp_query->bindValue(":object", object);
-    temp_query->bindValue(":system", system);
-    temp_query->bindValue(":description", description);
+    temp_query->bindValue(":name", form.name);
+    temp_query->bindValue(":title", form.title);
+    temp_query->bindValue(":object", form.object);
+    temp_query->bindValue(":system", form.system);
+    temp_query->bindValue(":description", form.description);
     if(!temp_query->exec()) {
         QMessageBox::warning(this, "Ошибка!", "Не удалось добавить формат!", QMessageBox::Yes);
         return;
@@ -165,17 +165,17 @@ void form::slotAddFormat(QString name, QString title, QString object, QString sy
     this->on_comboBox_tables_activated(ui->comboBox_tables->currentIndex());
 }
 
-void form::slotUpdateFormat(int id, QString name, QString title, QString object, QString system, QString description)
+void form::slotUpdateFormat(format_struct form)
 {
     QSharedPointer<QSqlQuery> temp_query = QSharedPointer<QSqlQuery>(new QSqlQuery(db));
     temp_query->prepare("UPDATE formats SET name = :name, title = :title, object = :object, system = :system, description = :description "
                          "WHERE id = :id");
-    temp_query->bindValue(":name", name);
-    temp_query->bindValue(":title", title);
-    temp_query->bindValue(":object", object);
-    temp_query->bindValue(":system", system);
-    temp_query->bindValue(":description", description);
-    temp_query->bindValue(":id", id);
+    temp_query->bindValue(":name", form.name);
+    temp_query->bindValue(":title", form.title);
+    temp_query->bindValue(":object", form.object);
+    temp_query->bindValue(":system", form.system);
+    temp_query->bindValue(":description", form.description);
+    temp_query->bindValue(":id", form.id);
     if(!temp_query->exec()) {
         QMessageBox::warning(this, "Ошибка!", "Не удалось обновить формат!", QMessageBox::Yes);
         return;
@@ -183,18 +183,18 @@ void form::slotUpdateFormat(int id, QString name, QString title, QString object,
     this->on_comboBox_tables_activated(ui->comboBox_tables->currentIndex());
 }
 
-void form::slotAddCommand(QString name, QString par1_type, QString par2_type, QString par1_text, QString par2_text, QString model, QString description)
+void form::slotAddCommand(command_struct com)
 {
     QSharedPointer<QSqlQuery> temp_query = QSharedPointer<QSqlQuery>(new QSqlQuery(db));
     temp_query->prepare("INSERT INTO commands (name, par1_type, par2_type, par1_text, par2_text, model, description) "
                         "VALUES (:name, :par1_type, :par2_type, :par1_text, :par2_text, :model, :description)");
-    temp_query->bindValue(":name", name);
-    temp_query->bindValue(":par1_type", par1_type);
-    temp_query->bindValue(":par2_type", par2_type);
-    temp_query->bindValue(":par1_text", par1_text);
-    temp_query->bindValue(":par2_text", par2_text);
-    temp_query->bindValue(":model", model);
-    temp_query->bindValue(":description", description);
+    temp_query->bindValue(":name", com.name);
+    temp_query->bindValue(":par1_type", com.par1_type);
+    temp_query->bindValue(":par2_type", com.par2_type);
+    temp_query->bindValue(":par1_text", com.par1_text);
+    temp_query->bindValue(":par2_text", com.par2_text);
+    temp_query->bindValue(":model", com.model);
+    temp_query->bindValue(":description", com.description);
     if(!temp_query->exec()) {
         QMessageBox::warning(this, "Ошибка!", "Не удалось добавить команду!", QMessageBox::Yes);
         return;
@@ -202,15 +202,15 @@ void form::slotAddCommand(QString name, QString par1_type, QString par2_type, QS
     this->on_comboBox_tables_activated(ui->comboBox_tables->currentIndex());
 }
 
-void form::slotUpdateCommand(int id, QString name, QString par1_type, QString par2_type, QString par1_text, QString par2_text, QString model, QString description)
+void form::slotUpdateCommand(command_struct com)
 {
     QSharedPointer<QSqlQuery> temp_query = QSharedPointer<QSqlQuery>(new QSqlQuery(db));
     temp_query->prepare("UPDATE commands SET name = :name, model = :model, description = :description "
                         "WHERE id = :id");
-    temp_query->bindValue(":name", name);
-    temp_query->bindValue(":model", model);
-    temp_query->bindValue(":description", description);
-    temp_query->bindValue(":id", id);
+    temp_query->bindValue(":name", com.name);
+    temp_query->bindValue(":model", com.model);
+    temp_query->bindValue(":description", com.description);
+    temp_query->bindValue(":id", com.id);
     if(!temp_query->exec()) {
         QMessageBox::warning(this, "Ошибка!", "Не удалось обновить команду!", QMessageBox::Yes);
         return;
@@ -218,16 +218,16 @@ void form::slotUpdateCommand(int id, QString name, QString par1_type, QString pa
     this->on_comboBox_tables_activated(ui->comboBox_tables->currentIndex());
 }
 
-void form::slotAddVariable(QString name, QString model, QString type, uint size, QString description)
+void form::slotAddVariable(variable_struct var)
 {
     QSharedPointer<QSqlQuery> temp_query = QSharedPointer<QSqlQuery>(new QSqlQuery(db));
     temp_query->prepare("INSERT INTO variables (name, model, type, size, description) "
                         "VALUES (:name, :model, :type, :size, :description)");
-    temp_query->bindValue(":name", name);
-    temp_query->bindValue(":model", model);
-    temp_query->bindValue(":type", type);
-    temp_query->bindValue(":size", size);
-    temp_query->bindValue(":description", description);
+    temp_query->bindValue(":name", var.name);
+    temp_query->bindValue(":model", var.model);
+    temp_query->bindValue(":type", var.type);
+    temp_query->bindValue(":size", var.size);
+    temp_query->bindValue(":description", var.description);
     if(!temp_query->exec()) {
         QMessageBox::warning(this, "Ошибка!", "Не удалось добавить переменную!", QMessageBox::Yes);
         return;
@@ -235,17 +235,17 @@ void form::slotAddVariable(QString name, QString model, QString type, uint size,
     this->on_comboBox_tables_activated(ui->comboBox_tables->currentIndex());
 }
 
-void form::slotUpdateVariable(int id, QString name, QString model, QString type, uint size, QString description)
+void form::slotUpdateVariable(variable_struct var)
 {
     QSharedPointer<QSqlQuery> temp_query = QSharedPointer<QSqlQuery>(new QSqlQuery(db));
     temp_query->prepare("UPDATE variables SET name = :name, model = :model, type = :type, size = :size, description = :description "
                         "WHERE id = :id");
-    temp_query->bindValue(":name", name);
-    temp_query->bindValue(":model", model);
-    temp_query->bindValue(":type", type);
-    temp_query->bindValue(":size", size);
-    temp_query->bindValue(":description", description);
-    temp_query->bindValue(":id", id);
+    temp_query->bindValue(":name", var.name);
+    temp_query->bindValue(":model", var.model);
+    temp_query->bindValue(":type", var.type);
+    temp_query->bindValue(":size", var.size);
+    temp_query->bindValue(":description", var.description);
+    temp_query->bindValue(":id", var.id);
     if(!temp_query->exec()) {
         QMessageBox::warning(this, "Ошибка!", "Не удалось обновить переменную!", QMessageBox::Yes);
         return;

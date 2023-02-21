@@ -54,25 +54,25 @@ form::form(QWidget *parent)
     ui->comboBox_tables->addItem("Переменные");
     ui->comboBox_tables->addItem("Команды");
 
-    connect(&addModelForm, SIGNAL(signalAddModel(QString,QString,QString,QString)),
-            this, SLOT(slotAddModel(QString,QString,QString,QString)));
-    connect(&addModelForm, SIGNAL(signalUpdateModel(int,QString,QString,QString,QString)),
-            this, SLOT(slotUpdateModel(int,QString,QString,QString,QString)));
+    connect(&addModelForm, SIGNAL(signalAddModel(model_struct)),
+            this, SLOT(slotAddModel(model_struct)));
+    connect(&addModelForm, SIGNAL(signalUpdateModel(model_struct)),
+            this, SLOT(slotUpdateModel(model_struct)));
 
-    connect(&addFormatForm, SIGNAL(signalAddFormat(QString,QString,QString,QString,QString)),
-            this, SLOT(slotAddFormat(QString,QString,QString,QString,QString)));
-    connect(&addFormatForm, SIGNAL(signalUpdateFormat(int,QString,QString,QString,QString,QString)),
-            this, SLOT(slotUpdateFormat(int,QString,QString,QString,QString,QString)));
+    connect(&addFormatForm, SIGNAL(signalAddFormat(format_struct)),
+            this, SLOT(slotAddFormat(format_struct)));
+    connect(&addFormatForm, SIGNAL(signalUpdateFormat(format_struct)),
+            this, SLOT(slotUpdateFormat(format_struct)));
 
-    connect(&addCommandForm, SIGNAL(signalAddCommand(QString,QString,QString,QString,QString,QString,QString)),
-            this, SLOT(slotAddCommand(QString,QString,QString,QString,QString,QString,QString)));
-    connect(&addCommandForm, SIGNAL(signalUpdateCommand(int,QString,QString,QString,QString,QString,QString,QString)),
-            this, SLOT(slotUpdateCommand(int,QString,QString,QString,QString,QString,QString,QString)));
+    connect(&addCommandForm, SIGNAL(signalAddCommand(command_struct)),
+            this, SLOT(slotAddCommand(command_struct)));
+    connect(&addCommandForm, SIGNAL(signalUpdateCommand(command_struct)),
+            this, SLOT(slotUpdateCommand(command_struct)));
 
-    connect(&addVariableForm, SIGNAL(signalAddVariable(QString,QString,QString,uint,QString)),
-            this, SLOT(slotAddVariable(QString,QString,QString,uint,QString)));
-    connect(&addVariableForm, SIGNAL(signalUpdateVariable(int,QString,QString,QString,uint,QString)),
-            this, SLOT(slotUpdateVariable(int,QString,QString,QString,uint,QString)));
+    connect(&addVariableForm, SIGNAL(signalAddVariable(variable_struct)),
+            this, SLOT(slotAddVariable(variable_struct)));
+    connect(&addVariableForm, SIGNAL(signalUpdateVariable(variable_struct)),
+            this, SLOT(slotUpdateVariable(variable_struct)));
 
     connect(&sqlForm,SIGNAL(signalSQLrequest(QString)),this,SLOT(slotSQLrequest(QString)));
 
@@ -144,6 +144,7 @@ void form::setWidgetInfo(QString label1, QString data1,
                          QString label4, QString data4,
                          QString label5, QString data5,
                          QString label6, QString data6,
+                         QString label7, QString data7,
                          QString description)
 {
     ui->label1info->setText(label1); ui->label1data->setText(data1);
@@ -152,39 +153,41 @@ void form::setWidgetInfo(QString label1, QString data1,
     ui->label4info->setText(label4); ui->label4data->setText(data4);
     ui->label5info->setText(label5); ui->label5data->setText(data5);
     ui->label6info->setText(label6); ui->label6data->setText(data6);
+    ui->label7info->setText(label7); ui->label7data->setText(data7);
     ui->labelDescription->setText(description);
 }
 
 void form::on_bAdd_clicked()
 {
     switch(currentScreen) {
-        case Screen::model:
-            addModelForm.setCurrentData("","","","");
+        case Screen::model: {
+            model_struct mod;
+            addModelForm.setCurrentData({ -1, "", "", "", ""});
             addModelForm.setData(getNamesListFromTable("objects"),
                                  getNamesListFromTable("systems"));
             addModelForm.setModal(true);
             addModelForm.show();
-        break;
-        case Screen::format:
-            addFormatForm.setCurrentData("","","","","");
+        } break;
+        case Screen::format: {
+            addFormatForm.setCurrentData({ -1, "", "", "", "", ""});
             addFormatForm.setData(getNamesListFromTable("objects"),
                                  getNamesListFromTable("systems"));
             addFormatForm.setModal(true);
             addFormatForm.show();
-        break;
-        case Screen::variable:
-            addVariableForm.setCurrentData("","","",0,"");
+        } break;
+        case Screen::variable: {
+            addVariableForm.setCurrentData({ -1, "", "", "", 0, ""});
             addVariableForm.setData(getNamesListFromTable("models"),
                                     getNamesListFromTable("variable_types"));
             addVariableForm.setModal(true);
             addVariableForm.show();
-        break;
-        case Screen::command:
-            addCommandForm.setCurrentData("","","");
+        } break;
+        case Screen::command: {
+            addCommandForm.setCurrentData({ -1, "", "", "", "", "", "", ""});
             addCommandForm.setData(getNamesListFromTable("models"),getNamesListFromTable("variable_types"));
             addCommandForm.setModal(true);
             addCommandForm.show();
-        break;
+        } break;
     }
 }
 
@@ -204,6 +207,7 @@ void form::on_listWidget_itemClicked(QListWidgetItem *item)
                               "ID: ",q->value(0).toString(),
                               "","",
                               "","",
+                              "","",
                               q->value(4).toString());
                 currentEditID = q->value(0).toInt();
             }
@@ -219,6 +223,7 @@ void form::on_listWidget_itemClicked(QListWidgetItem *item)
                               "Изделие: ",q->value(3).toString(),
                               "Система: ",q->value(4).toString(),
                               "ID: ",q->value(0).toString(),
+                              "","",
                               "","",
                               q->value(5).toString());
                 currentEditID = q->value(0).toInt();
@@ -236,23 +241,25 @@ void form::on_listWidget_itemClicked(QListWidgetItem *item)
                               "Размерность: ",q->value(4).toString(),
                               "ID: ",q->value(0).toString(),
                               "","",
+                              "","",
                               q->value(5).toString());
                 currentEditID = q->value(0).toInt();
             }
         } break;
         case Screen::command: {
-            QString sExecute = "SELECT id, name, model, description FROM commands WHERE name = '" + sName + "'";
+            QString sExecute = "SELECT id, name, par1_type, par2_type, par1_text, par2_text, model, description FROM commands WHERE name = '" + sName + "'";
             QSharedPointer<QSqlQuery> q = QSharedPointer<QSqlQuery>(new QSqlQuery(db));
             q->exec(sExecute);
             QSqlRecord r = q->record();
             while(q->next()) {
             setWidgetInfo("Имя команды: ",q->value(1).toString(),
-                          "Модель-обработчик: ",q->value(2).toString(),
+                          "Модель-обработчик: ",q->value(6).toString(),
                           "ID: ",q->value(0).toString(),
+                          QString("Пар.1: %1").arg(q->value(2).toString()),QString("%1").arg(q->value(4).toString()),
+                          QString("Пар.2: %1").arg(q->value(3).toString()),QString("%1").arg(q->value(5).toString()),
                           "","",
                           "","",
-                          "","",
-                          q->value(3).toString());
+                          q->value(7).toString());
             currentEditID = q->value(0).toInt();
             }
         } break;
@@ -316,10 +323,11 @@ void form::on_bEdit_clicked()
             QSharedPointer<QSqlQuery> q = QSharedPointer<QSqlQuery>(new QSqlQuery(db));
             q->exec(sExecute);
             while(q->next()) {
-                addModelForm.setCurrentData(q->value(1).toString(),
-                                            q->value(2).toString(),
-                                            q->value(3).toString(),
-                                            q->value(4).toString());
+                addModelForm.setCurrentData({q->value(0).toInt(),
+                                             q->value(1).toString(),
+                                             q->value(2).toString(),
+                                             q->value(3).toString(),
+                                             q->value(4).toString()});
             }
             addModelForm.setModal(true);
             addModelForm.show();
@@ -332,23 +340,52 @@ void form::on_bEdit_clicked()
             QSharedPointer<QSqlQuery> q = QSharedPointer<QSqlQuery>(new QSqlQuery(db));
             q->exec(sExecute);
             while(q->next()) {
-                addFormatForm.setCurrentData(q->value(1).toString(),
-                                            q->value(2).toString(),
-                                            q->value(3).toString(),
-                                            q->value(4).toString(),
-                                            q->value(5).toString());
+                addFormatForm.setCurrentData({q->value(0).toInt(),
+                                              q->value(1).toString(),
+                                              q->value(2).toString(),
+                                              q->value(3).toString(),
+                                              q->value(4).toString(),
+                                              q->value(5).toString()});
             }
             addFormatForm.setModal(true);
             addFormatForm.show();
         } break;
-        case Screen::variable:
+        case Screen::variable: {
             addVariableForm.setData(getNamesListFromTable("models"),
                                     getNamesListFromTable("variable_types"),true,currentEditID);
+            QString sName = ui->listWidget->currentItem()->text();
+            QString sExecute = "SELECT id, name, model, type, size, description FROM variables WHERE name = '" + sName + "'";
+            QSharedPointer<QSqlQuery> q = QSharedPointer<QSqlQuery>(new QSqlQuery(db));
+            q->exec(sExecute);
+            while(q->next()) {
+                addVariableForm.setCurrentData({q->value(0).toInt(),
+                                                q->value(1).toString(),
+                                                q->value(2).toString(),
+                                                q->value(3).toString(),
+                                                q->value(4).toUInt(),
+                                                q->value(5).toString()});
+
+            }
             addVariableForm.setModal(true);
             addVariableForm.show();
-        break;
+        } break;
         case Screen::command:
             addCommandForm.setData(getNamesListFromTable("models"),getNamesListFromTable("variable_types"),true,currentEditID);
+            QString sName = ui->listWidget->currentItem()->text();
+            QString sExecute = "SELECT id, name, par1_type, par2_type, par1_text, par1_text, model, description FROM commands WHERE name = '" + sName + "'";
+            QSharedPointer<QSqlQuery> q = QSharedPointer<QSqlQuery>(new QSqlQuery(db));
+            q->exec(sExecute);
+            while(q->next()) {
+                addCommandForm.setCurrentData({q->value(0).toInt(),
+                                               q->value(1).toString(),
+                                               q->value(2).toString(),
+                                               q->value(3).toString(),
+                                               q->value(4).toString(),
+                                               q->value(5).toString(),
+                                               q->value(6).toString(),
+                                               q->value(7).toString()});
+
+            }
             addCommandForm.setModal(true);
             addCommandForm.show();
         break;
@@ -371,6 +408,7 @@ void form::on_action_generate_triggered()
 
     try {
         generateCore();
+        generateModels();
     } catch (QException *e) {
         qDebug() << e->what();
     }

@@ -29,12 +29,12 @@ void addmodel::setData(const QStringList Objects, const QStringList Systems, boo
         setWindowTitle("Добавление модели");
 }
 
-void addmodel::setCurrentData(QString name, QString object, QString system, QString description)
+void addmodel::setCurrentData(model_struct mod)
 {
-    ui->eName->setText(name);
-    ui->cbObject->setCurrentText(object);
-    ui->cbSystem->setCurrentText(system);
-    ui->eDescription->setText(description);
+    ui->eName->setText(mod.name);
+    ui->cbObject->setCurrentText(mod.object);
+    ui->cbSystem->setCurrentText(mod.system);
+    ui->eDescription->setText(mod.description);
 }
 
 void addmodel::on_bCancel_clicked()
@@ -52,17 +52,17 @@ void addmodel::on_bAdd_clicked()
         QMessageBox::warning(this, "Ошибка!", "Заполните все поля!", QMessageBox::Yes);
         return;
     }
+    model_struct model;
+    model.name = ui->eName->text();
+    model.object = ui->cbObject->currentText();
+    model.system = ui->cbSystem->currentText();
+    model.description = ui->eDescription->text();
     if(EditMode)    {
-        emit signalUpdateModel(ID,
-                               ui->eName->text(),
-                               ui->cbObject->currentText(),
-                               ui->cbSystem->currentText(),
-                               ui->eDescription->text());
+        model.id = ID;
+        emit signalUpdateModel(model);
     } else {
-        emit signalAddModel(ui->eName->text(),
-                            ui->cbObject->currentText(),
-                            ui->cbSystem->currentText(),
-                            ui->eDescription->text());
+        model.id = -1;
+        emit signalAddModel(model);
     }
     this->close();
 }

@@ -29,13 +29,13 @@ void addformat::setData(const QStringList Objects, const QStringList Systems, bo
         setWindowTitle("Добавление формата");
 }
 
-void addformat::setCurrentData(QString name, QString title, QString object, QString system, QString description)
+void addformat::setCurrentData(format_struct form)
 {
-    ui->eName->setText(name);
-    ui->eTitle->setText(title);
-    ui->cbObject->setCurrentText(object);
-    ui->cbSystem->setCurrentText(system);
-    ui->eDescription->setText(description);
+    ui->eName->setText(form.name);
+    ui->eTitle->setText(form.title);
+    ui->cbObject->setCurrentText(form.object);
+    ui->cbSystem->setCurrentText(form.system);
+    ui->eDescription->setText(form.description);
 }
 
 void addformat::on_bCancel_clicked()
@@ -54,19 +54,18 @@ void addformat::on_bAdd_clicked()
         QMessageBox::warning(this, "Ошибка!", "Заполните все поля!", QMessageBox::Yes);
         return;
     }
+    format_struct form;
+    form.name = ui->eName->text();
+    form.title = ui->eTitle->text();
+    form.object = ui->cbObject->currentText();
+    form.system = ui->cbSystem->currentText();
+    form.description = ui->eDescription->text();
     if(EditMode)    {
-        emit signalUpdateFormat(ID,
-                                ui->eName->text(),
-                                ui->eTitle->text(),
-                                ui->cbObject->currentText(),
-                                ui->cbSystem->currentText(),
-                                ui->eDescription->text());
+        form.id = ID;
+        emit signalUpdateFormat(form);
     } else {
-        emit signalAddFormat(ui->eName->text(),
-                             ui->eTitle->text(),
-                             ui->cbObject->currentText(),
-                             ui->cbSystem->currentText(),
-                             ui->eDescription->text());
+        form.id = -1;
+        emit signalAddFormat(form);
     }
     this->close();
 }

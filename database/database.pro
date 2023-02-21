@@ -31,6 +31,7 @@ HEADERS += \
     addformat.h \
     addmodel.h \
     addvariable.h \
+    data_struct.h \
     form.h \
     sqlform.h
 

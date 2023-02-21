@@ -2,6 +2,7 @@
 #define ADDCOMMAND_H
 
 #include <QDialog>
+#include "data_struct.h"
 
 namespace Ui {
 class addcommand;
@@ -16,11 +17,11 @@ public:
     ~addcommand();
 
     void setData(const QStringList Models,const QStringList Types, bool EditMode = false, int id = -1);
-    void setCurrentData(QString name, QString model, QString description);
+    void setCurrentData(command_struct com);
 
 signals:
-    void signalAddCommand(QString,QString,QString,QString,QString,QString,QString);
-    void signalUpdateCommand(int,QString,QString,QString,QString,QString,QString,QString);
+    void signalAddCommand(command_struct);
+    void signalUpdateCommand(command_struct);
 
 private slots:
     void on_bCancel_clicked();

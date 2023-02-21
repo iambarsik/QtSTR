@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QStringList>
+#include "data_struct.h"
 
 namespace Ui {
 class addform;
@@ -17,11 +18,11 @@ public:
     ~addmodel();
 
     void setData(const QStringList Objects, const QStringList Systems, bool EditMode = false, int id = -1);
-    void setCurrentData(QString name, QString object, QString system, QString description);
+    void setCurrentData(model_struct mod);
 
 signals:
-    void signalAddModel(QString,QString,QString,QString);
-    void signalUpdateModel(int,QString,QString,QString,QString);
+    void signalAddModel(model_struct);
+    void signalUpdateModel(model_struct);
 
 private slots:
     void on_bCancel_clicked();

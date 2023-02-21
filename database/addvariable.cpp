@@ -29,13 +29,13 @@ void addvariable::setData(const QStringList Models, const QStringList Types, boo
         setWindowTitle("Добавление переменной");
 }
 
-void addvariable::setCurrentData(QString name, QString model, QString type, uint size, QString description)
+void addvariable::setCurrentData(variable_struct var)
 {
-    ui->eName->setText(name);
-    ui->cbModel->setCurrentText(model);
-    ui->cbType->setCurrentText(type);
-    ui->eSize->setText(QString("%1").arg(size));
-    ui->eDescription->setText(description);
+    ui->eName->setText(var.name);
+    ui->cbModel->setCurrentText(var.model);
+    ui->cbType->setCurrentText(var.type);
+    ui->eSize->setText(QString("%1").arg(var.size));
+    ui->eDescription->setText(var.description);
 }
 
 void addvariable::on_bAdd_clicked()
@@ -49,19 +49,18 @@ void addvariable::on_bAdd_clicked()
         QMessageBox::warning(this, "Ошибка!", "Заполните все поля!", QMessageBox::Yes);
         return;
     }
+    variable_struct var;
+    var.name = ui->eName->text();
+    var.model = ui->cbModel->currentText();
+    var.type = ui->cbType->currentText();
+    var.size = ui->eSize->text().toUInt();
+    var.description = ui->eDescription->text();
     if(EditMode)    {
-        emit signalUpdateVariable(ID,
-                                  ui->eName->text(),
-                                  ui->cbModel->currentText(),
-                                  ui->cbType->currentText(),
-                                  ui->eSize->text().toUInt(),
-                                  ui->eDescription->text());
+        var.id = ID;
+        emit signalUpdateVariable(var);
     } else {
-        emit signalAddVariable(ui->eName->text(),
-                               ui->cbModel->currentText(),
-                               ui->cbType->currentText(),
-                               ui->eSize->text().toUInt(),
-                               ui->eDescription->text());
+        var.id = -1;
+        emit signalAddVariable(var);
     }
     this->close();
 }

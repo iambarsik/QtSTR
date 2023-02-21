@@ -31,11 +31,15 @@ void addcommand::setData(const QStringList Models, const QStringList Types, bool
         setWindowTitle("Добавление команды");
 }
 
-void addcommand::setCurrentData(QString name, QString model, QString description)
+void addcommand::setCurrentData(command_struct com)
 {
-    ui->eName->setText(name);
-    ui->cbModel->setCurrentText(model);
-    ui->eDescription->setText(description);
+    ui->eName->setText(com.name);
+    ui->cbPar1Type->setCurrentText(com.par1_type);
+    ui->cbPar2Type->setCurrentText(com.par2_type);
+    ui->cbModel->setCurrentText(com.model);
+    ui->ePar1Com->setText(com.par1_text);
+    ui->ePar2Com->setText(com.par2_text);
+    ui->eDescription->setText(com.description);
 }
 
 void addcommand::on_bCancel_clicked()
@@ -52,23 +56,20 @@ void addcommand::on_bAdd_clicked()
         QMessageBox::warning(this, "Ошибка!", "Заполните все поля!", QMessageBox::Yes);
         return;
     }
+    command_struct com;
+    com.name = ui->eName->text();
+    com.par1_type = ui->cbPar1Type->currentText();
+    com.par2_type = ui->cbPar2Type->currentText();
+    com.par1_text = ui->ePar1Com->text();
+    com.par2_text = ui->ePar2Com->text();
+    com.model = ui->cbModel->currentText();
+    com.description = ui->eDescription->text();
     if(EditMode)    {
-        emit signalUpdateCommand(ID,
-                                 ui->eName->text(),
-                                 ui->cbPar1Type->currentText(),
-                                 ui->cbPar2Type->currentText(),
-                                 ui->ePar1Com->text(),
-                                 ui->ePar2Com->text(),
-                                 ui->cbModel->currentText(),
-                                 ui->eDescription->text());
+        com.id = ID;
+        emit signalUpdateCommand(com);
     } else {
-        emit signalAddCommand(ui->eName->text(),
-                              ui->cbPar1Type->currentText(),
-                              ui->cbPar2Type->currentText(),
-                              ui->ePar1Com->text(),
-                              ui->ePar2Com->text(),
-                              ui->cbModel->currentText(),
-                              ui->eDescription->text());
+        com.id = -1;
+        emit signalAddCommand(com);
     }
     this->close();
 }

@@ -2,6 +2,7 @@
 #define ADDFORMAT_H
 
 #include <QDialog>
+#include "data_struct.h"
 
 namespace Ui {
 class addformat;
@@ -16,11 +17,11 @@ public:
     ~addformat();
 
     void setData(const QStringList Objects, const QStringList Systems, bool EditMode = false, int id = -1);
-    void setCurrentData(QString name, QString title, QString object, QString system, QString description);
+    void setCurrentData(format_struct form);
 
 signals:
-    void signalAddFormat(QString,QString,QString,QString,QString);
-    void signalUpdateFormat(int,QString,QString,QString,QString,QString);
+    void signalAddFormat(format_struct);
+    void signalUpdateFormat(format_struct);
 
 private slots:
     void on_bCancel_clicked();

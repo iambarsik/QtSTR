@@ -20,6 +20,7 @@
 #include "addcommand.h"
 #include "addvariable.h"
 #include "sqlform.h"
+#include "data_struct.h"
 
 enum Screen {
     model,
@@ -43,14 +44,14 @@ public:
 private slots:
     void on_comboBox_tables_activated(int index);
 
-    void slotAddModel(QString name, QString object, QString system, QString description);
-    void slotUpdateModel(int,QString name, QString object, QString system, QString description);
-    void slotAddFormat(QString name, QString title, QString object, QString system, QString description);
-    void slotUpdateFormat(int id, QString name, QString title, QString object, QString system, QString description);
-    void slotAddCommand(QString name, QString par1_type, QString par2_type, QString par1_text, QString par2_text, QString model, QString description);
-    void slotUpdateCommand(int id, QString name, QString par1_type, QString par2_type, QString par1_text, QString par2_text, QString model, QString description);
-    void slotAddVariable(QString name, QString model, QString type, uint size, QString description);
-    void slotUpdateVariable(int id, QString name, QString model, QString type, uint size, QString description);
+    void slotAddModel(model_struct mod);
+    void slotUpdateModel(model_struct mod);
+    void slotAddFormat(format_struct form);
+    void slotUpdateFormat(format_struct form);
+    void slotAddCommand(command_struct com);
+    void slotUpdateCommand(command_struct com);
+    void slotAddVariable(variable_struct var);
+    void slotUpdateVariable(variable_struct var);
     void slotSQLrequest(QString execute);
 
     void on_bAdd_clicked();
@@ -89,13 +90,14 @@ private:
                        QString label4, QString data4,
                        QString label5, QString data5,
                        QString label6, QString data6,
+                       QString label7, QString data7,
                        QString description);
 
     QString sProjectDir;
     QString sDB_tag;
 
     void generateCore();
-    //void generateModels();
+    void generateModels();
     //void generateFormats();
     void saveCodeToFile(const QStringList code, QFile &file);
 };

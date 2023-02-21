@@ -2,6 +2,7 @@
 #define ADDVARIABLE_H
 
 #include <QDialog>
+#include "data_struct.h"
 
 namespace Ui {
 class addvariable;
@@ -16,11 +17,11 @@ public:
     ~addvariable();
 
     void setData(const QStringList Models,const QStringList Types, bool EditMode = false, int id = -1);
-    void setCurrentData(QString name, QString model, QString type, uint size, QString description);
+    void setCurrentData(variable_struct var);
 
 signals:
-    void signalAddVariable(QString,QString,QString,uint,QString);
-    void signalUpdateVariable(int,QString,QString,QString,uint,QString);
+    void signalAddVariable(variable_struct);
+    void signalUpdateVariable(variable_struct);
 
 private slots:
     void on_bAdd_clicked();

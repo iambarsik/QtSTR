@@ -97,7 +97,7 @@ void NetworkServer::appendToSocketList(QTcpSocket* socket) {
     connect(socket, &QTcpSocket::disconnected, this, &NetworkServer::discardSocket);
     connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(getErrorCode(QAbstractSocket::SocketError)));
     qDebug() << QString("Node %1 descriptor has connected").arg(socket->socketDescriptor());
-    emit signalClientIsConnected(connection_set.size());
+    emit signalClientsAreConnected(connection_set.size());
 }
 
 void NetworkServer::discardSocket()    {
@@ -108,6 +108,7 @@ void NetworkServer::discardSocket()    {
         connection_set.remove(*it);
     }
     socket->deleteLater();
+    emit signalClientsAreConnected(connection_set.size());
 }
 
 void NetworkServer::getErrorCode(QAbstractSocket::SocketError errorCode)   {

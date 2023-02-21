@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class><GEN_FORMAT_NAME></class>
+ <widget class="QWidget" name="<GEN_FORMAT_NAME>">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>600</width>
+    <height>400</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>600</width>
+    <height>400</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string><GEN_FORMAT_TITLE></string>
+  </property>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

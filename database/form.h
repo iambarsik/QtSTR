@@ -98,7 +98,7 @@ private:
 
     void generateCore();
     void generateModels();
-    //void generateFormats();
+    void generateFormats();
     void saveCodeToFile(const QStringList code, QFile &file);
 };
 #endif // FORM_H

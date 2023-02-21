@@ -10,7 +10,7 @@ class Q_DECL_EXPORT ModelQ: public QObject
 {
     Q_OBJECT
 public:
-    ModelQ(CoreQ *core, int id);
+    ModelQ(CoreQ *core, int id, QString name, QString object, QString system);
     CoreQ *core;
 
     void virtual init() {}
@@ -35,6 +35,9 @@ signals:
 private:
     QTimer *model_timer;
     uint id = -1;
+    QString model_name = "unnamed";
+    QString model_object = "noobject";
+    QString model_system = "nosystem";
 
 
 };

@@ -1,7 +1,7 @@
 #include "m_test.h"
 
 M_TEST::M_TEST(CoreQ * core)
-    : ModelQ(core, MODEL_ID)
+    : ModelQ(core, MODEL_ID, "M_TEST", "НЭМ", "СУБА")
 {
 
 }

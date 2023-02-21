@@ -2,6 +2,7 @@
 #define STR_H
 
 #include <QMainWindow>
+#include <QSharedPointer>
 #include <QDebug>
 #include <QTimer>
 #include <QByteArray>

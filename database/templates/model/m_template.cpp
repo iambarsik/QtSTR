@@ -1,7 +1,7 @@
 #include "<GEN_MODEL_NAME>.h"
 
 <GEN_MODEL_NAME>::<GEN_MODEL_NAME>(CoreQ * core)
-    : ModelQ(core, MODEL_ID)
+    : ModelQ(core, MODEL_ID,<GEN_MODEL_INFO>)
 {
 
 }

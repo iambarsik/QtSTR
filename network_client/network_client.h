@@ -17,7 +17,6 @@ public:
     NetworkClient(QString Host, qint32 Port);
     ~NetworkClient();
 
-
     void addCommand(command_t command);
 
 signals:

@@ -23,7 +23,7 @@ public:
     void addPackage(QByteArray package);
 
 signals:
-    void signalClientIsConnected(int);
+    void signalClientsAreConnected(int);
     void signalCommandFromClient(command_t);
 
 

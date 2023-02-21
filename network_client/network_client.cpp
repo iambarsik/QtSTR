@@ -41,7 +41,6 @@ NetworkClient::NetworkClient(QString Host, qint32 Port)
 NetworkClient::~NetworkClient()
 {
     socket->disconnectFromHost();
-    socket->close();
     socket->deleteLater();
 }
 

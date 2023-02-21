@@ -19,8 +19,6 @@ public:
     CoreQ();
 
     CommandsQ commands;
-    // {
-    // begin methods for puck/unpack core data for network
 
     void pushInt(qint64 value);
     void popInt(QByteArray &arr, qint64 &variable);
@@ -29,17 +27,8 @@ public:
     void pushChar(char value);
     void popChar(QByteArray &arr, char &variable);
 
-    // }
-    // end methods for puck/unpack core data for network
-
-    // {
-    // begin of system methods
-
     bool isStartCore() { return str_system_start; }
     QByteArray getPackage();
-
-    // end of system methods
-    // }
 
 
 public slots:
@@ -48,8 +37,6 @@ public slots:
     void stopCore() { str_system_start = false; }
 
 public:
-    // {
-    // begin of getters for variables
 
     qint64 get_test_var1() { return core_test_var1; }
     qint64 get_test_var2() { return core_test_var2; }
@@ -65,23 +52,11 @@ public:
     double get_test_double2() { return core_test_double2; }
     double get_test_double3() { return core_test_double3; }
 
-    // end of getters for variables
-    // }
-
-
 private:
 
-    // {
-    // begin of system variables
 
     bool str_system_start;
     QByteArray m_package;
-
-    // end of system variables
-    // }
-
-    // {
-    // begin database generated variables
 
     qint64 core_test_var1; void set_test_var1(qint64 test_var1) { core_test_var1 = test_var1; }
     qint64 core_test_var2; void set_test_var2(qint64 test_var2) { core_test_var2 = test_var2; }
@@ -97,8 +72,6 @@ private:
     double core_test_double2; void set_test_double2(double test_double2) { core_test_double2 = test_double2; }
     double core_test_double3; void set_test_double3(double test_double3) { core_test_double3 = test_double3; }
 
-    // end database generated variables
-    // }
 
 
 };

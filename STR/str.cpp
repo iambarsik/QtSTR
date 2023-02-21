@@ -66,7 +66,7 @@ STR::STR(QWidget *parent)
 
     if(bServerNode) {
         STR_server = new NetworkServer(iHostPort);
-        connect(STR_server,SIGNAL(signalClientIsConnected(int)),
+        connect(STR_server,SIGNAL(signalClientsAreConnected(int)),
                 this,SLOT(setClientInformation(int)));
         connect(STR_server,SIGNAL(signalCommandFromClient(command_t)),
                 this,SLOT(slotReadCommand(command_t)));
@@ -93,13 +93,19 @@ STR::STR(QWidget *parent)
 
 STR::~STR()
 {
+    emit stop();
     STR_timer->stop();
-    delete STR_timer;
+    STR_timer->disconnect();
+
+    delete core;
+    delete model_test;
+
     if(bServerNode) {
         delete STR_server;
     } else {
         delete STR_client;
     }
+    delete STR_timer;
     delete ui;
 }
 

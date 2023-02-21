@@ -384,7 +384,6 @@ void form::on_bEdit_clicked()
                                                q->value(5).toString(),
                                                q->value(6).toString(),
                                                q->value(7).toString()});
-
             }
             addCommandForm.setModal(true);
             addCommandForm.show();
@@ -409,6 +408,7 @@ void form::on_action_generate_triggered()
     try {
         generateCore();
         generateModels();
+        generateFormats();
     } catch (QException *e) {
         qDebug() << e->what();
     }

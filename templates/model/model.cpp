@@ -1,9 +1,12 @@
 #include "model.h"
 
-ModelQ::ModelQ(CoreQ *core, int id)
+ModelQ::ModelQ(CoreQ *core, int id, QString name, QString object, QString system)
 {
     this->core = core;
     this->id = id;
+    this->model_name = name;
+    this->model_object = object;
+    this->model_system = system;
     model_timer = new QTimer;
     model_timer->setInterval(100);
     connect(model_timer, &QTimer::timeout,this, &ModelQ::run);

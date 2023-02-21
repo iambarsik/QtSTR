@@ -342,9 +342,6 @@ void form::generateModels()
     QDir project_dir = QDir::currentPath() + "/" + sProjectDir;
     QDir models_dir = project_dir.path() + "/models";
 
-    //qDebug() << project_dir.path();
-    //qDebug() << models_dir.path();
-
     if(!project_dir.exists()) {
         qDebug() << "GEN :: project directory is not exists...";
         qDebug() << "GEN :: be sure that core generator had worked succesfuly...";
@@ -397,6 +394,7 @@ void form::generateModels()
         QStringList generatedCode;
 
         QString sTagName = "<GEN_MODEL_NAME>";
+        QString sTagInfo = "<GEN_MODEL_INFO>";
 
             // prepare correct data for fill code sections
         QStringList buff_list;
@@ -487,11 +485,6 @@ void form::generateModels()
 
         for(int i = 0; i < cleanCode.size(); i++)    {
             generatedCode.append(cleanCode[i]);
-            /*
-            if(cleanCode[i].contains("//<VAR_SECTION>"))  {
-                generatedCode.append(VARS);
-            }
-            */
         }
 
         saveCodeToFile(generatedCode,fCode);
@@ -531,7 +524,7 @@ void form::generateModels()
             generatedCode.append(cleanCode[i]);
             if(cleanCode[i].contains("//<MODEL_ID_SECTION>"))  {
                 generatedCode.append("#define MODEL_ID " + getCellFromTable("id","models","name",mod));
-                generatedCode.append("QString MODEL_NAME = \"" + mod + "\"");
+                //generatedCode.append("QString MODEL_NAME = \"" + mod + "\"");
             }
             if(cleanCode[i].contains("//<DEFINE_COMMANDS_SECTION>"))  {
                 generatedCode.append(COMMANDS_DEFINES);
@@ -571,6 +564,14 @@ void form::generateModels()
                cleanCode.append(s);
                continue;
             }
+            if(originalCode[i].contains(sTagInfo))  {
+               QString s = originalCode[i];
+               QString obj = getCellFromTable("object","models","name",mod);
+               QString sys = getCellFromTable("system","models","name",mod);
+               s.replace(sTagInfo,QString("\"%1\",\"%2\",\"%3\"").arg(mod).arg(obj).arg(sys));
+               cleanCode.append(s);
+               continue;
+            }
             cleanCode.append(originalCode[i]);
         }
 
@@ -586,8 +587,6 @@ void form::generateModels()
                 COMMANDS_TO_SWITCH.append(COMMANDS[i]);
             }
         }
-
-
 
         for(int i = 0; i < cleanCode.size(); i++)    {
             generatedCode.append(cleanCode[i]);
@@ -637,33 +636,240 @@ void form::generateModels()
                     generatedCode.append("\t\t} break;");
                 }
             }
-            /*
-            if(cleanCode[i].contains("//<DEFINE_COMMANDS_SECTION>"))  {
-                generatedCode.append(COMMANDS_DEFINES);
+        }
+        saveCodeToFile(generatedCode,fCode);
+    }    
+}
+
+void form::generateFormats()
+{
+    QDir project_dir = QDir::currentPath() + "/" + sProjectDir;
+    QDir formats_dir = project_dir.path() + "/formats";
+
+    if(!project_dir.exists()) {
+        qDebug() << "GEN :: project directory is not exists...";
+        qDebug() << "GEN :: be sure that core generator had worked succesfuly...";
+        return;
+    }
+    if(!formats_dir.exists()) {
+        qDebug() << "GEN :: formats directory is not exists...";
+        qDebug() << "GEN :: creating formats directory...";
+        formats_dir.setPath(project_dir.path());
+        if(!formats_dir.mkdir("formats")) {
+                qDebug() << "GEN :: cant create formats directory " << formats_dir.path() + "/formats";
+                return;
+        }
+        formats_dir.setPath(project_dir.path() + "/formats");
+        qDebug() << "GEN :: formats directory in " << formats_dir.path() << "is createed...";
+    }
+
+        // generating each format
+
+    QStringList FormatList = getNamesListFromTable("formats");
+
+    foreach(QString form, FormatList) {
+        QDir current_format_dir = formats_dir.path() + "/" + form;
+
+        if(!current_format_dir.exists()) {
+            qDebug() << "GEN :: " << form << " directory is not exists...";
+            qDebug() << "GEN :: creating model directory...";
+            current_format_dir.setPath(formats_dir.path());
+            if(!current_format_dir.mkdir(form)) {
+                    qDebug() << "GEN :: cant create " << current_format_dir.path();
+                    return;
             }
-            */
+            current_format_dir.setPath(formats_dir.path() + "/" + form);
+            qDebug() << "GEN :: " << form << " is createed...";
+        }
+        if(!QFile::exists(current_format_dir.path() + "/" + form + ".pro"))   {
+                // copy new model files from template
+            if(
+            !QFile::copy("../templates/format/f_template.pro",current_format_dir.path() + "/" + form + ".pro") ||
+            !QFile::copy("../templates/format/f_template.h",current_format_dir.path() + "/" + form + ".h") ||
+            !QFile::copy("../templates/format/f_template.cpp",current_format_dir.path() + "/" + form + ".cpp") ||
+            !QFile::copy("../templates/format/f_template.ui",current_format_dir.path() + "/" + form + ".ui")) {
+                qDebug() << "GEN :: cant copy format files for " + form + " from template";
+                return;
+            }
+        }
+
+        QFile fCode;
+        QStringList originalCode;
+        QStringList cleanCode;
+        QStringList generatedCode;
+
+        QString sTagName = "<GEN_FORMAT_NAME>";
+        QString sTagTitle = "<GEN_FORMAT_TITLE>";
+        QString sFormatTitle = getCellFromTable("title","formats","name",form);
+
+            // ==================================================== generating "format_name.pro" ===========================================================
+
+        originalCode.clear();
+        cleanCode.clear();
+        generatedCode.clear();
+        fCode.setFileName(current_format_dir.path() + "/" + form + ".pro");
+        if(fCode.open(QFile::ReadOnly)) {
+            QTextStream out(&fCode);
+            QString line;
+            while (out.readLineInto(&line)) {
+                originalCode.append(line);
+                line.clear();
+            }
+        } else {
+            qDebug() << "GEN :: cant open " << form << ".pro file";
+        }
+        fCode.close();
+
+        for(int i = 0; i < originalCode.size(); i++)    {
+            if(originalCode[i].contains(sTagName))  {
+               QString s = originalCode[i];
+               s.replace(sTagName,form);
+               cleanCode.append(s);
+               continue;
+            }
+            cleanCode.append(originalCode[i]);
+        }
+
+        /*
+         * add something with generating if needs to be added
+         * */
+
+        for(int i = 0; i < cleanCode.size(); i++)    {
+            generatedCode.append(cleanCode[i]);
         }
 
         saveCodeToFile(generatedCode,fCode);
 
+            // ==================================================== generating "format_name.h" ===========================================================
 
+        originalCode.clear();
+        cleanCode.clear();
+        generatedCode.clear();
+        fCode.setFileName(current_format_dir.path() + "/" + form + ".h");
+        if(fCode.open(QFile::ReadOnly)) {
+            QTextStream out(&fCode);
+            QString line;
+            while (out.readLineInto(&line)) {
+                originalCode.append(line);
+                line.clear();
+            }
+        } else {
+            qDebug() << "GEN :: cant open " << form << ".h file";
+        }
+        fCode.close();
 
-
-
-
-        /*
-        for(int i = 0; i < generatedCode.size(); i++)    {
-            qDebug() << generatedCode[i];
+        for(int i = 0; i < originalCode.size(); i++)    {
+            if(originalCode[i].contains(sDB_tag))  {
+                continue;
+            }
+            if(originalCode[i].contains(sTagName))  {
+               QString s = originalCode[i];
+               s.replace(sTagName,form);
+               cleanCode.append(s);
+               continue;
+            }
+            cleanCode.append(originalCode[i]);
         }
 
-        */
+        /*
+         * add something with generating if needs to be added
+         * */
 
+        for(int i = 0; i < cleanCode.size(); i++)    {
+            generatedCode.append(cleanCode[i]);
+        }
 
-        //qDebug() << mod;
+        saveCodeToFile(generatedCode,fCode);
+
+            // ==================================================== generating "format_name.cpp" ===========================================================
+
+        originalCode.clear();
+        cleanCode.clear();
+        generatedCode.clear();
+        fCode.setFileName(current_format_dir.path() + "/" + form + ".cpp");
+        if(fCode.open(QFile::ReadOnly)) {
+            QTextStream out(&fCode);
+            QString line;
+            while (out.readLineInto(&line)) {
+                originalCode.append(line);
+                line.clear();
+            }
+        } else {
+            qDebug() << "GEN :: cant open " << form << ".cpp file";
+        }
+        fCode.close();
+
+        for(int i = 0; i < originalCode.size(); i++)    {
+            if(originalCode[i].contains(sDB_tag))  {
+                continue;
+            }
+            if(originalCode[i].contains(sTagName))  {
+               QString s = originalCode[i];
+               s.replace(sTagName,form);
+               cleanCode.append(s);
+               continue;
+            }
+            cleanCode.append(originalCode[i]);
+        }
+
+        /*
+         * add something with generating if needs to be added
+         * */
+
+        for(int i = 0; i < cleanCode.size(); i++)    {
+            generatedCode.append(cleanCode[i]);
+        }
+
+        saveCodeToFile(generatedCode,fCode);
+
+            // ==================================================== generating "format_name.ui" ===========================================================
+
+        originalCode.clear();
+        cleanCode.clear();
+        generatedCode.clear();
+        fCode.setFileName(current_format_dir.path() + "/" + form + ".ui");
+        if(fCode.open(QFile::ReadOnly)) {
+            QTextStream out(&fCode);
+            QString line;
+            while (out.readLineInto(&line)) {
+                originalCode.append(line);
+                line.clear();
+            }
+        } else {
+            qDebug() << "GEN :: cant open " << form << ".ui file";
+        }
+        fCode.close();
+
+        for(int i = 0; i < originalCode.size(); i++)    {
+            if(originalCode[i].contains(sDB_tag))  {
+                continue;
+            }
+            if(originalCode[i].contains(sTagName))  {
+               QString s = originalCode[i];
+               s.replace(sTagName,form);
+               cleanCode.append(s);
+               continue;
+            }
+            if(originalCode[i].contains(sTagTitle))  {
+                QString s = originalCode[i];
+                s.replace(sTagTitle,sFormatTitle);
+                cleanCode.append(s);
+                continue;
+            }
+            cleanCode.append(originalCode[i]);
+        }
+
+        /*
+         * add something with generating if needs to be added
+         * */
+
+        for(int i = 0; i < cleanCode.size(); i++)    {
+            generatedCode.append(cleanCode[i]);
+        }
+
+        saveCodeToFile(generatedCode,fCode);
+
     }
-
-
-
 }
 
 void form::saveCodeToFile(const QStringList code, QFile &file)

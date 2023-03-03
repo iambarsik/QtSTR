@@ -409,6 +409,7 @@ void form::on_action_generate_triggered()
         generateCore();
         generateModels();
         generateFormats();
+        generateManager();
     } catch (QException *e) {
         qDebug() << e->what();
     }

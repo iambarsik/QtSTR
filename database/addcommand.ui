@@ -302,6 +302,17 @@
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>eName</tabstop>
+  <tabstop>cbPar1Type</tabstop>
+  <tabstop>ePar1Com</tabstop>
+  <tabstop>cbPar2Type</tabstop>
+  <tabstop>ePar2Com</tabstop>
+  <tabstop>cbModel</tabstop>
+  <tabstop>eDescription</tabstop>
+  <tabstop>bAdd</tabstop>
+  <tabstop>bCancel</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

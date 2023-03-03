@@ -194,6 +194,14 @@
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>eName</tabstop>
+  <tabstop>cbObject</tabstop>
+  <tabstop>cbSystem</tabstop>
+  <tabstop>eDescription</tabstop>
+  <tabstop>bAdd</tabstop>
+  <tabstop>bCancel</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

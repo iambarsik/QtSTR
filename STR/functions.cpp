@@ -1,9 +1,8 @@
 #include "str.h"
-#include "../core/commandsq.h"
 
 void STR::initModels()   {
-    model_test = new M_TEST(core);
-    modelList.push_back(model_test);
+    //model_test = new M_TEST(core);
+    //modelList.push_back(model_test);
 }
 
 void STR::ConnectModel(ModelQ *model)
@@ -47,9 +46,9 @@ void STR::slotReadCommand(command_t command)
 
                 uint model_id = core->commands.getModelOwner(command.code);
                 if(model_id != 0) {
-                    for(int i = 0; i < modelList.size(); i++) {
-                        if(model_id == modelList[i]->getID())    {
-                            modelList[i]->ReadCommand(command);
+                    for(int i = 0; i < object_manager->modelList.size(); i++) {
+                        if(model_id == object_manager->modelList[i]->getID())    {
+                            object_manager->modelList[i]->ReadCommand(command);
                             break;
                         }
                     }

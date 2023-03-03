@@ -6,7 +6,7 @@ NetworkClient::NetworkClient(QString Host, qint32 Port)
     socket = new QTcpSocket(this);
 
     connect(socket, SIGNAL(readyRead()), this, SLOT(readyRead()));
-    connect(socket, &QTcpSocket::disconnected, this, &NetworkClient::discardSocket);
+    connect(socket, &QTcpSocket::disconnected, this, &NetworkClient::connectToSTRServer);
     connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(getErrorCode(QAbstractSocket::SocketError)));
 
     m_timer = new QTimer;
@@ -14,34 +14,38 @@ NetworkClient::NetworkClient(QString Host, qint32 Port)
     connect(m_timer,SIGNAL(timeout()),this,SLOT(OnTimer()));
 
         // try to connect to server
-    try {
-        socket->connectToHost(Host,Port);
-
-        if(socket->waitForConnected())  {
-            qDebug() << "Connected to Server";
-            qDebug() << QString("System :: connected to server");
-            bConnected = true;
-            sendMessage(command_type::com_init);
-        } else {
-            qDebug() << "System :: connecting ERROR";
-            exit(EXIT_FAILURE);
-        }
-
-        m_timer->start();
-        //bInited = false;
-        sendMessage(command_type::com_init);
-    } catch (QException *e) {
-        qDebug() << e->what();
-    }
-
-    bInit = false;
-
+    sHost = Host;
+    iPort = Port;
+    connectToSTRServer();
 }
 
 NetworkClient::~NetworkClient()
 {
     socket->disconnectFromHost();
     socket->deleteLater();
+}
+
+bool NetworkClient::connectToSTRServer()
+{
+    try {
+        socket->connectToHost(sHost,iPort);
+
+        if(socket->waitForConnected())  {
+            qDebug() << "Connected to Server";
+            qDebug() << QString("System :: connected to server");
+            sendMessage(command_type::com_init);
+            bConnected = true;
+            m_timer->start();
+        } else {
+            qDebug() << "System :: connecting ERROR";
+        }
+    } catch (QException *e) {
+        qDebug() << e->what();
+        bConnected = false;
+        return false;
+    }
+    bInit = false;
+    return true;
 }
 
 void NetworkClient::OnTimer()  {
@@ -51,8 +55,8 @@ void NetworkClient::OnTimer()  {
 }
 
 void NetworkClient::discardSocket()    {
-    socket->deleteLater();
-    socket=nullptr;
+    //socket->deleteLater();
+    //socket=nullptr;
     qDebug() << "Disconnected from server!";
 }
 
@@ -235,23 +239,6 @@ void NetworkClient::sendMessage(command_type type)   {
 
 
 void NetworkClient::addCommand(command_t command)  {
-    /*
-    bufferSend.clear();
-    bufferSend.append((command.code >> 24) & 0xFF);
-    bufferSend.append((command.code >> 16) & 0xFF);
-    bufferSend.append((command.code >> 8)  & 0xFF);
-    bufferSend.append((command.code) & 0xFF);
-
-    bufferSend.append((command.par1 >> 24) & 0xFF);
-    bufferSend.append((command.par1 >> 16) & 0xFF);
-    bufferSend.append((command.par1 >> 8)  & 0xFF);
-    bufferSend.append((command.par1) & 0xFF);
-
-    bufferSend.append((command.par2 >> 24) & 0xFF);
-    bufferSend.append((command.par2 >> 16) & 0xFF);
-    bufferSend.append((command.par2 >> 8)  & 0xFF);
-    bufferSend.append((command.par2) & 0xFF);
-    */
 
     bufferSend.clear();
     bufferSend.append((command.code >> 24) & 0xFF);
@@ -260,8 +247,6 @@ void NetworkClient::addCommand(command_t command)  {
     bufferSend.append((command.code) & 0xFF);
     bufferSend.append(command.par1.data);
     bufferSend.append(command.par2.data);
-
-
 
     qDebug() << QString("Command is sent: %1 %2 %3").arg(command.code).arg(command.par1.toInt()).arg(command.par2.toInt());
     sendMessage(command_type::com_buffer);

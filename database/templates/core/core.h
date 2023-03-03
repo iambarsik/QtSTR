@@ -21,8 +21,8 @@ public:
 
     CommandsQ commands;
 
-    void pushInt(qint32 value);
-    void popInt(QByteArray &arr, qint32 &variable);
+    void pushInt(qint64 value);
+    void popInt(QByteArray &arr, qint64 &variable);
     QByteArray pushDouble(double value);
     void popDouble(QByteArray &arr, double &variable);
     void pushChar(char value);

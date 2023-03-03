@@ -83,6 +83,11 @@
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>eSQL</tabstop>
+  <tabstop>bExecute</tabstop>
+  <tabstop>bCancel</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

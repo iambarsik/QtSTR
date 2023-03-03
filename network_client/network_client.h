@@ -17,7 +17,11 @@ public:
     NetworkClient(QString Host, qint32 Port);
     ~NetworkClient();
 
+    bool connectToSTRServer();
+    bool isConnected() { return bConnected; }
+
     void addCommand(command_t command);
+
 
 signals:
     void signalPackageFromServer(QByteArray);
@@ -39,6 +43,9 @@ private:
 
     bool bConnected;
     QTimer *m_timer;
+
+    QString sHost;
+    qint32 iPort;
     bool bInit;
 };
 

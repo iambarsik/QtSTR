@@ -122,7 +122,7 @@ void form::generateCore()
                 } else if(type == "double") {
                     var_constructor = QString(" for(int i = 0; i < %2; i++) { core_%1[i] = 0.0; }").arg(name).arg(size);
                     var_pack = QString(" for(int i = 0; i < %2; i++) { m_package.append(pushDouble(core_%1[i])); }").arg(name).arg(size);
-                    var_unpack = QString(" for(int i = 0; i < %2; i++) { m_package.append(popDouble(arr,core_%1[i])); }").arg(name).arg(size);
+                    var_unpack = QString(" for(int i = 0; i < %2; i++) { popDouble(arr,core_%1[i]); }").arg(name).arg(size);
                 } else if(type == "char")   {
                     var_constructor = QString(" for(int i = 0; i < %2; i++) { core_%1[i] = 0; }").arg(name).arg(size);
                     var_pack = QString(" for(int i = 0; i < %2; i++) { pushChar(core_%1[i]); }").arg(name).arg(size);
@@ -440,11 +440,11 @@ void form::generateModels()
                 QString var_to_core;
 
                 if(var_size > 0)    {
-                    var = QString(" %1 core_%2[%3]; // %4").arg(type).arg(name).arg(size).arg(description);
+                    var = QString(" %1 %2[%3]; // %4").arg(type).arg(name).arg(size).arg(description);
                     var_from_core = QString(" for(int i = 0; i < %2; i++) { %1[i] = core->get_%1(i); }").arg(name).arg(size);
                     var_to_core = QString(" for(int i = 0; i < %2; i++) { core->set_%1(%1[i],i); }").arg(name).arg(size);
                 } else {
-                    var = QString(" %1 core_%2; // %3").arg(type).arg(name).arg(description);
+                    var = QString(" %1 %2; // %3").arg(type).arg(name).arg(description);
                     var_from_core = QString(" %1 = core->get_%1();").arg(name);
                     var_to_core = QString(" core->set_%1(%1);").arg(name);
                 }
@@ -523,8 +523,7 @@ void form::generateModels()
         for(int i = 0; i < cleanCode.size(); i++)    {
             generatedCode.append(cleanCode[i]);
             if(cleanCode[i].contains("//<MODEL_ID_SECTION>"))  {
-                generatedCode.append("#define MODEL_ID " + getCellFromTable("id","models","name",mod));
-                //generatedCode.append("QString MODEL_NAME = \"" + mod + "\"");
+                generatedCode.append(sDB_tag + " #define MODEL_ID " + getCellFromTable("id","models","name",mod));
             }
             if(cleanCode[i].contains("//<DEFINE_COMMANDS_SECTION>"))  {
                 generatedCode.append(COMMANDS_DEFINES);
@@ -700,6 +699,7 @@ void form::generateFormats()
 
         QString sTagName = "<GEN_FORMAT_NAME>";
         QString sTagTitle = "<GEN_FORMAT_TITLE>";
+        QString sTagInfo = "<GEN_FORMAT_INFO>";
         QString sFormatTitle = getCellFromTable("title","formats","name",form);
 
             // ==================================================== generating "format_name.pro" ===========================================================
@@ -736,6 +736,9 @@ void form::generateFormats()
 
         for(int i = 0; i < cleanCode.size(); i++)    {
             generatedCode.append(cleanCode[i]);
+            if(cleanCode[i].contains("//<FORMAT_ID_SECTION>"))  {
+                generatedCode.append("#define FORMAT_ID " + getCellFromTable("id","formats","name",form));
+            }
         }
 
         saveCodeToFile(generatedCode,fCode);
@@ -771,12 +774,11 @@ void form::generateFormats()
             cleanCode.append(originalCode[i]);
         }
 
-        /*
-         * add something with generating if needs to be added
-         * */
-
         for(int i = 0; i < cleanCode.size(); i++)    {
             generatedCode.append(cleanCode[i]);
+            if(cleanCode[i].contains("//<FORMAT_ID_SECTION>"))  {
+                generatedCode.append(sDB_tag + " #define FORMAT_ID " + getCellFromTable("id","formats","name",form));
+            }
         }
 
         saveCodeToFile(generatedCode,fCode);
@@ -808,6 +810,20 @@ void form::generateFormats()
                s.replace(sTagName,form);
                cleanCode.append(s);
                continue;
+            }
+            if(originalCode[i].contains(sTagInfo))  {
+               QString s = originalCode[i];
+               QString obj = getCellFromTable("object","formats","name",form);
+               QString sys = getCellFromTable("system","formats","name",form);
+               s.replace(sTagInfo,QString("\"%1\",\"%2\",\"%3\"").arg(form).arg(obj).arg(sys));
+               cleanCode.append(s);
+               continue;
+            }
+            if(originalCode[i].contains(sTagTitle))  {
+                QString s = originalCode[i];
+                s.replace(sTagTitle,sFormatTitle);
+                cleanCode.append(s);
+                continue;
             }
             cleanCode.append(originalCode[i]);
         }
@@ -870,6 +886,255 @@ void form::generateFormats()
         saveCodeToFile(generatedCode,fCode);
 
     }
+}
+
+void form::generateManager()
+{
+    QDir project_dir = QDir::currentPath() + "/" + sProjectDir;
+    QDir manager_dir = project_dir.path() + "/manager";
+
+    if(!project_dir.exists()) {
+        qDebug() << "GEN :: project directory is not exists...";
+        qDebug() << "GEN :: be sure that core generator had worked succesfuly...";
+        return;
+    }
+    if(!manager_dir.exists()) {
+        qDebug() << "GEN :: manager directory is not exists...";
+        qDebug() << "GEN :: creating manager directory...";
+        manager_dir.setPath(project_dir.path());
+        if(!manager_dir.mkdir("manager")) {
+                qDebug() << "GEN :: cant create manager directory " << manager_dir.path() + "/manager";
+                return;
+        }
+        manager_dir.setPath(project_dir.path() + "/manager");
+        qDebug() << "GEN :: manager directory in " << manager_dir.path() << "is createed...";
+    }
+    if(!QFile::exists(manager_dir.path() + "/manager.pro"))   {
+            // copy new manager files from template
+        if(
+        !QFile::copy("../templates/manager/manager.pro",manager_dir.path() + "/manager.pro") ||
+        !QFile::copy("../templates/manager/modules.pri",manager_dir.path() + "/modules.pri") ||
+        !QFile::copy("../templates/manager/modules.h",manager_dir.path() + "/modules.h") ||
+        !QFile::copy("../templates/manager/manager.h",manager_dir.path() + "/manager.h") ||
+        !QFile::copy("../templates/manager/manager.cpp",manager_dir.path() + "/manager.cpp")) {
+            qDebug() << "GEN :: cant copy manager files from template";
+            return;
+        }
+    }
+
+    QFile fCode;
+    QStringList originalCode;
+    QStringList cleanCode;
+    QStringList generatedCode;
+
+    QStringList MODELS_H;
+    QStringList M_MODULES_H;
+    QStringList M_MODULES_PRI;
+    QStringList MODELS_CONSTRUCTOR;
+    QStringList MODELS_DESTRUCTOR;
+
+        // prepare correct data for fill code sections
+    QStringList buff_list;
+
+    buff_list.clear();
+    buff_list = getNamesListFromTable("models");
+
+    for(int i = 0; i < buff_list.size(); i++) {
+        MODELS_H.append(sDB_tag + QString(" %1 * m_%1;").arg(buff_list[i]));
+        M_MODULES_H.append(sDB_tag + QString(" #include \"../models/%1/%1.h\"").arg(buff_list[i]));
+
+        M_MODULES_PRI.append(QString("INCLUDEPATH += $$PWD/../models/%1").arg(buff_list[i]));
+        M_MODULES_PRI.append(QString("DEPENDPATH += $$PWD/../models/%1").arg(buff_list[i]));
+        M_MODULES_PRI.append(QString("win32: LIBS += -L$$PWD/../_output/ -l%1").arg(buff_list[i]));
+        M_MODULES_PRI.append(QString(""));
+
+        MODELS_CONSTRUCTOR.append(sDB_tag + QString(" m_%1 = new %1(core); modelList.push_back(m_%1);").arg(buff_list[i]));
+        MODELS_DESTRUCTOR.append(sDB_tag + QString(" delete m_%1;").arg(buff_list[i]));
+    }
+
+    QStringList F_MODULES_H;
+    QStringList FORMATS_ENUM;
+    QStringList FORMATS_CONSTRUCTOR;
+    QStringList FORMAT_SWITCH;
+    QStringList F_MODULES_PRI;
+
+    buff_list.clear();
+    buff_list = getNamesListFromTable("formats");
+
+    foreach(QString form, buff_list)    {
+        QString sExecute = "SELECT id, title, object, system FROM formats WHERE name = '" + form + "'";
+        QSharedPointer<QSqlQuery> q = QSharedPointer<QSqlQuery>(new QSqlQuery(db));
+        q->exec(sExecute);
+        while(q->next()) {
+
+            uint form_id = q->value(0).toUInt();
+            QString title = q->value(1).toString();
+            QString object = q->value(2).toString();
+            QString system = q->value(3).toString();
+
+            F_MODULES_H.append(sDB_tag + QString(" #include \"../formats/%1/%1.h\"").arg(form));
+            FORMATS_ENUM.append(sDB_tag + QString(" enum_%1,").arg(form));
+            FORMATS_CONSTRUCTOR.append(sDB_tag + QString(" formatList.push_back({%2, enum_%1, \"%3\", \"%4\", \"%5\"});").arg(form).arg(form_id).arg(title).arg(object).arg(system));
+            FORMAT_SWITCH.append(sDB_tag + QString(" case enum_%1: f = new %1(core); break;").arg(form));
+
+            F_MODULES_PRI.append(QString("INCLUDEPATH += $$PWD/../formats/%1").arg(form));
+            F_MODULES_PRI.append(QString("DEPENDPATH += $$PWD/../formats/%1").arg(form));
+            F_MODULES_PRI.append(QString("win32: LIBS += -L$$PWD/../formats/ -l%1").arg(form));
+            F_MODULES_PRI.append(QString(""));
+        }
+    }
+
+    for(int i = 0; i < buff_list.size(); i++) {
+
+    }
+
+        // ==================================================== generating "manager.h" ===========================================================
+
+    originalCode.clear();
+    cleanCode.clear();
+    generatedCode.clear();
+    fCode.setFileName(manager_dir.path() + "/manager.h");
+    if(fCode.open(QFile::ReadOnly)) {
+        QTextStream out(&fCode);
+        QString line;
+        originalCode.clear();
+        while (out.readLineInto(&line)) {
+            originalCode.append(line);
+            line.clear();
+        }
+    } else {
+        qDebug() << "GEN :: cant open manager.h files";
+    }
+    fCode.close();
+
+    for(int i = 0; i < originalCode.size(); i++)    {
+        if(originalCode[i].contains(sDB_tag))  {
+            continue;
+        }
+        cleanCode.append(originalCode[i]);
+    }
+
+    for(int i = 0; i < cleanCode.size(); i++)    {
+        generatedCode.append(cleanCode[i]);
+        if(cleanCode[i].contains("//<MODEL_SECTION>"))  {
+            generatedCode.append(MODELS_H);
+        }
+    }
+
+    saveCodeToFile(generatedCode,fCode);
+
+        // ==================================================== generating "modules.h" ===========================================================
+
+    originalCode.clear();
+    cleanCode.clear();
+    generatedCode.clear();
+    fCode.setFileName(manager_dir.path() + "/modules.h");
+    if(fCode.open(QFile::ReadOnly)) {
+        QTextStream out(&fCode);
+        QString line;
+        originalCode.clear();
+        while (out.readLineInto(&line)) {
+            originalCode.append(line);
+            line.clear();
+        }
+    } else {
+        qDebug() << "GEN :: cant open modules.h files";
+    }
+    fCode.close();
+
+    for(int i = 0; i < originalCode.size(); i++)    {
+        if(originalCode[i].contains(sDB_tag))  {
+            continue;
+        }
+        cleanCode.append(originalCode[i]);
+    }
+
+    for(int i = 0; i < cleanCode.size(); i++)    {
+        generatedCode.append(cleanCode[i]);
+        if(cleanCode[i].contains("//<M_MODULES_H>"))  {
+            generatedCode.append(M_MODULES_H);
+        }
+        if(cleanCode[i].contains("//<F_MODULES_H>"))  {
+            generatedCode.append(F_MODULES_H);
+        }
+        if(cleanCode[i].contains("//<ENUM_FORMAT>"))  {
+            generatedCode.append(FORMATS_ENUM);
+        }
+    }
+
+    saveCodeToFile(generatedCode,fCode);
+
+        // ==================================================== generating "manager.cpp" ===========================================================
+
+    originalCode.clear();
+    cleanCode.clear();
+    generatedCode.clear();
+    fCode.setFileName(manager_dir.path() + "/manager.cpp");
+    if(fCode.open(QFile::ReadOnly)) {
+        QTextStream out(&fCode);
+        QString line;
+        originalCode.clear();
+        while (out.readLineInto(&line)) {
+            originalCode.append(line);
+            line.clear();
+        }
+    } else {
+        qDebug() << "GEN :: cant open manager.cpp files";
+    }
+    fCode.close();
+
+    for(int i = 0; i < originalCode.size(); i++)    {
+        if(originalCode[i].contains(sDB_tag))  {
+            continue;
+        }
+        cleanCode.append(originalCode[i]);
+    }
+
+    for(int i = 0; i < cleanCode.size(); i++)    {
+        generatedCode.append(cleanCode[i]);
+        if(cleanCode[i].contains("//<MODEL_CONSTRUCTOR>"))  {
+            generatedCode.append(MODELS_CONSTRUCTOR);
+        }
+        if(cleanCode[i].contains("//<FORMAT_CONSTRUCTOR>"))  {
+            generatedCode.append(FORMATS_CONSTRUCTOR);
+        }
+        if(cleanCode[i].contains("//<MODEL_DESTRUCTOR>"))  {
+            generatedCode.append(MODELS_DESTRUCTOR);
+        }
+        if(cleanCode[i].contains("//<FORMAT_SWITCH>"))  {
+            generatedCode.append(FORMAT_SWITCH);
+        }
+    }
+
+    saveCodeToFile(generatedCode,fCode);
+
+
+        // ==================================================== generating "modules.pri" ===========================================================
+
+    originalCode.clear();
+    cleanCode.clear();
+    generatedCode.clear();
+    fCode.setFileName(manager_dir.path() + "/modules.pri");
+
+    generatedCode.append("#--------------------------------- FORMATS ----------------------------------\n");
+    generatedCode.append(F_MODULES_PRI);
+    generatedCode.append("#--------------------------------- MODELS -----------------------------------\n");
+    generatedCode.append(M_MODULES_PRI);
+
+    saveCodeToFile(generatedCode,fCode);
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 void form::saveCodeToFile(const QStringList code, QFile &file)

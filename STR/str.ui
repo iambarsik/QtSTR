@@ -20,8 +20,13 @@
       <x>116</x>
       <y>2</y>
       <width>111</width>
-      <height>23</height>
+      <height>31</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
     </property>
     <property name="text">
      <string>ПУСК</string>
@@ -31,7 +36,7 @@
     <property name="geometry">
      <rect>
       <x>348</x>
-      <y>5</y>
+      <y>10</y>
       <width>261</width>
       <height>16</height>
      </rect>
@@ -49,10 +54,10 @@
    <widget class="QMdiArea" name="mdiArea">
     <property name="geometry">
      <rect>
-      <x>-1</x>
-      <y>30</y>
+      <x>0</x>
+      <y>40</y>
       <width>1151</width>
-      <height>601</height>
+      <height>591</height>
      </rect>
     </property>
     <property name="layoutDirection">
@@ -65,14 +70,21 @@
    <widget class="QPushButton" name="pushButtonTest">
     <property name="geometry">
      <rect>
-      <x>589</x>
+      <x>630</x>
       <y>2</y>
       <width>161</width>
-      <height>23</height>
+      <height>31</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
+    </property>
     <property name="text">
-     <string>Вызвать тестовый формат</string>
+     <string>Контейнер форматов</string>
     </property>
    </widget>
    <widget class="QPushButton" name="pushButtonStop">
@@ -81,8 +93,13 @@
       <x>228</x>
       <y>2</y>
       <width>111</width>
-      <height>23</height>
+      <height>31</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
     </property>
     <property name="text">
      <string>СТОП</string>
@@ -94,8 +111,13 @@
       <x>4</x>
       <y>2</y>
       <width>111</width>
-      <height>23</height>
+      <height>31</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+     </font>
     </property>
     <property name="text">
      <string>Отраб. НУ</string>
@@ -111,8 +133,38 @@
      <height>22</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>Здесь будет главное меню</string>
+    </property>
+    <addaction name="action_1"/>
+    <addaction name="action_2"/>
+    <addaction name="action_3"/>
+    <addaction name="action"/>
+   </widget>
+   <addaction name="menu"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="action_1">
+   <property name="text">
+    <string>Пункт 1</string>
+   </property>
+  </action>
+  <action name="action_2">
+   <property name="text">
+    <string>Пункт 2</string>
+   </property>
+  </action>
+  <action name="action_3">
+   <property name="text">
+    <string>Пункт 3</string>
+   </property>
+  </action>
+  <action name="action">
+   <property name="text">
+    <string>Выход</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

@@ -16,15 +16,17 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    formatcontainer.cpp \
     functions.cpp \
     main.cpp \
     str.cpp
 
 HEADERS += \
-    include_modules.h \
+    formatcontainer.h \
     str.h
 
 FORMS += \
+    formatcontainer.ui \
     str.ui
 
 # Default rules for deployment.

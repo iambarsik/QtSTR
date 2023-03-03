@@ -2,6 +2,7 @@
 #include "ui_str.h"
 
 #include <QScreen>
+#include <QSharedPointer>
 
 STR::STR(QWidget *parent)
     : QMainWindow(parent)
@@ -37,7 +38,7 @@ STR::STR(QWidget *parent)
     QScreen* screen = QApplication::screens().at(0);
     QSize size = screen->availableSize();
     this->setGeometry(0,0,size.width(),size.height());
-    ui->mdiArea->setGeometry(0,50,size.width(),size.height() - 100);
+    ui->mdiArea->setGeometry(0,40,size.width(),size.height() - 100);
 
         // stretch window for all screens
     if(multiScreen) {
@@ -62,7 +63,8 @@ STR::STR(QWidget *parent)
     connect(this,&STR::start,core,&CoreQ::startCore);
     connect(this,&STR::stop,core,&CoreQ::stopCore);
 
-    initModels();
+    object_manager = new ManagerQ(core);
+    //initModels();
 
     if(bServerNode) {
         STR_server = new NetworkServer(iHostPort);
@@ -70,9 +72,13 @@ STR::STR(QWidget *parent)
                 this,SLOT(setClientInformation(int)));
         connect(STR_server,SIGNAL(signalCommandFromClient(command_t)),
                 this,SLOT(slotReadCommand(command_t)));
-        for(int i = 0; i < modelList.size(); i++) {
-            ConnectModel(modelList[i]);
+        //for(int i = 0; i < modelList.size(); i++) {
+        //    ConnectModel(modelList[i]);
+        //}
+        for(int i = 0; i < object_manager->modelList.size(); i++) {
+            ConnectModel(object_manager->modelList[i]);
         }
+
         this->setWindowTitle("STR is runned as SERVER");
     } else {
         STR_client = new NetworkClient(sHostName, iHostPort);
@@ -85,9 +91,8 @@ STR::STR(QWidget *parent)
     STR_timer->setInterval(100);
     connect(STR_timer,SIGNAL(timeout()),
             this, SLOT(slotTimer()));
+
     STR_timer->start();
-
-
 
 }
 
@@ -98,7 +103,7 @@ STR::~STR()
     STR_timer->disconnect();
 
     delete core;
-    delete model_test;
+    //delete model_test;
 
     if(bServerNode) {
         delete STR_server;
@@ -109,10 +114,15 @@ STR::~STR()
     delete ui;
 }
 
-
 void STR::slotTimer()   {
     if(bServerNode == true)   {
         STR_server->addPackage(core->getPackage());
+    } else {
+/*
+        if(STR_client->isConnected() == false)  {
+            STR_client->connectToSTRServer();
+        }
+*/
     }
 
     if(core->isStartCore()) {
@@ -122,12 +132,18 @@ void STR::slotTimer()   {
     }
 }
 
-
 void STR::setClientInformation(int value)
 {
     this->setWindowTitle(QString("STR is runned as SERVER. %1 clients are connected").arg(value));
 }
 
+void STR::slotOpenFormat(STRformat_enum name)
+{
+    FormatQ *f = object_manager->openFormat(name);
+    ConnectFormat(f);
+    ui->mdiArea->addSubWindow(f);
+    f->show();
+}
 
 void STR::on_pushButtonSet_clicked()
 {
@@ -174,8 +190,13 @@ void STR::on_pushButtonStop_clicked()
 
 void STR::on_pushButtonTest_clicked()
 {
-    F_TEST *f = new F_TEST(core);
-    ConnectFormat(f);
+    formatcontainer *f = new formatcontainer(object_manager->getFormatList());
+    connect(f, SIGNAL(signalOpenFormat(STRformat_enum)),this, SLOT(slotOpenFormat(STRformat_enum)));
     ui->mdiArea->addSubWindow(f);
     f->show();
+}
+
+void STR::on_action_triggered()
+{
+    exit(0);
 }

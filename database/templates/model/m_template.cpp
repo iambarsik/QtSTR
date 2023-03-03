@@ -56,10 +56,10 @@ void <GEN_MODEL_NAME>::ReadCommand(command_t command)
     switch(command.code)    {
 //<COMMAND_SWITCH_TAG>	
         default:
-            qDebug() << "Unknown command in model " << MODEL_NAME;
+            qDebug() << "Unknown command in model " << getID();
         break;
     }
-    qDebug() << "Got command " << command.code << "in model " << MODEL_NAME;
+    qDebug() << "Got command " << command.code << "in model " << getID();
 //</COMMAND_SWITCH_SECTION>	
 //<TO_CORE_METHOD>
 /*<::db_generated::>*/ outputToCore();

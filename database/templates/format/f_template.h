@@ -1,6 +1,8 @@
 #ifndef <GEN_FORMAT_NAME>_H
 #define <GEN_FORMAT_NAME>_H
 
+//<FORMAT_ID_SECTION>
+
 #include <QWidget>
 
 #include "../../templates/format/format.h"

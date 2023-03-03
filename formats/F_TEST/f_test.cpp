@@ -2,7 +2,7 @@
 #include "ui_f_test.h"
 
 F_TEST::F_TEST(CoreQ * core, QWidget *parent)
-    : FormatQ(core, parent)
+    : FormatQ(core, FORMAT_ID, "F_TEST", "НЭМ", "СУБА", parent)
     , ui(new Ui::F_TEST)
 {
     ui->setupUi(this);

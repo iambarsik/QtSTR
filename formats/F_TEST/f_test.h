@@ -1,6 +1,8 @@
 #ifndef F_TEST_H
 #define F_TEST_H
 
+#define FORMAT_ID    1000
+
 #include <QWidget>
 #include <QTimer>
 

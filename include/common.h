@@ -1,6 +1,6 @@
 #pragma once
 #include <QDataStream>
-
+#include <QList>
 
 // 8 byte param for command that supports "double"
 struct STR_PARAM    {
@@ -77,3 +77,27 @@ struct STRCommand {
     QString description;
 };
 
+// format info for container
+template <typename T>
+struct STRFormat	{
+    uint id;
+    T name;
+    QString title;
+    QString object;
+    QString system;
+};
+
+// format list in system info for container
+template <typename T>
+struct STRFormatSystemContainer {
+    QString title;
+    QList <STRFormat<T>> FormatContainer;
+};
+
+// system list in object info for container
+template <typename T>
+struct STRFormatObjectContainer {
+    QString title;
+    QList <STRFormatSystemContainer<T>> SystemContainer;
+
+};

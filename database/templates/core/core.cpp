@@ -6,15 +6,19 @@ CoreQ::CoreQ()
 //</CONSTRUCTOR_SECTION>
 }
 
-void CoreQ::pushInt(qint32 value)
+void CoreQ::pushInt(qint64 value)
 {
+    m_package.append((value >> 56) & 0xFF);
+    m_package.append((value >> 48) & 0xFF);
+    m_package.append((value >> 40) & 0xFF);
+    m_package.append((value >> 32) & 0xFF);
     m_package.append((value >> 24) & 0xFF);
     m_package.append((value >> 16) & 0xFF);
     m_package.append((value >> 8)  & 0xFF);
     m_package.append((value >> 0)  & 0xFF);
 }
 
-void CoreQ::popInt(QByteArray &arr, qint32 &variable)
+void CoreQ::popInt(QByteArray &arr, qint64 &variable)
 {
     bool ok;
     variable = arr.mid(0,sizeof(variable)).toHex().toInt(&ok,16); arr.remove(0,sizeof (variable));
@@ -62,7 +66,7 @@ QByteArray CoreQ::getPackage()
 void CoreQ::setCoreFromPackage(QByteArray package)
 {
     QByteArray arr = package;
-    int buff = 0;
+    qint64 buff = 0;
     popInt(arr,buff); str_system_start = (bool) buff;
 
 //<UNPACK_SECTION>

@@ -10,14 +10,17 @@
 #include <QFile>
 
 #include <core.h>
+#include <manager.h>
 #include <model.h>
 #include <format.h>
+#include <network_client.h>
+#include <network_server.h>
 #include "../include/common.h"
 
-#include "include_modules.h"
+#include "formatcontainer.h"
 
-#include "../network_client/network_client.h"
-#include "../network_server/network_server.h"
+//#include "../network_client/network_client.h"
+//#include "../network_server/network_server.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class STR; }
@@ -32,6 +35,7 @@ public:
     ~STR();
 
     CoreQ *core;
+    ManagerQ *object_manager;
 
     void ConnectModel(ModelQ *model);
     void ConnectFormat(FormatQ *format);
@@ -39,7 +43,6 @@ public:
 
 private:
     void initModels();
-
 
 signals:
     void init();
@@ -53,6 +56,7 @@ private slots:
 
 public slots:
     void setClientInformation(int value);
+    void slotOpenFormat(STRformat_enum name);
 
 private slots:
 
@@ -62,13 +66,15 @@ private slots:
 
     void on_pushButtonTest_clicked();
 
+    void on_action_triggered();
+
 private:
 
     QTimer *STR_timer;
 
-    M_TEST *model_test;
-    QList<ModelQ *> modelList;
-    QList<FormatQ *> formatList;
+    //M_TEST *model_test;
+    //QList<ModelQ *> modelList;
+    //QList<FormatQ *> formatList;
 
     Ui::STR *ui;
 

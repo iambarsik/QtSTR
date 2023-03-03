@@ -1,8 +1,8 @@
 TEMPLATE = subdirs
 
 SUBDIRS = core \
-		  database \
-		  network_client \
+                  manager \
+                  network_client \
 		  network_server \
 		  templates/format \
 		  templates/model \

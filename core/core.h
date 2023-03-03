@@ -8,7 +8,6 @@
 
 #include "commandsq.h"
 
-
 class Q_DECL_EXPORT CoreQ : public QObject
 {
     Q_OBJECT

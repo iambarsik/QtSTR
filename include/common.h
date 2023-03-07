@@ -10,7 +10,19 @@ public:
 		data.clear();
 		data.append(arr);
 	}
-	STR_PARAM() {}
+	STR_PARAM() {}	
+    STR_PARAM(int value) {
+        data.clear();
+		qint64 v = (qint64) value;
+        data.append(static_cast<char>((v >> 56) & 0xFF));
+        data.append(static_cast<char>((v >> 48) & 0xFF));
+        data.append(static_cast<char>((v >> 40) & 0xFF));
+        data.append(static_cast<char>((v >> 32) & 0xFF));
+        data.append(static_cast<char>((v >> 24) & 0xFF));
+        data.append(static_cast<char>((v >> 16) & 0xFF));
+        data.append(static_cast<char>((v >> 8) & 0xFF));
+        data.append(static_cast<char>((v >> 0) & 0xFF));
+    }
     STR_PARAM(qint64 value) {
         data.clear();
         data.append(static_cast<char>((value >> 56) & 0xFF));

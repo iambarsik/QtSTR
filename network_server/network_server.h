@@ -15,9 +15,8 @@ class Q_DECL_EXPORT NetworkServer : public QObject
 {
     Q_OBJECT
 public:
-    NetworkServer(qint32 Port);
+    NetworkServer(STRNode NodeInfo);
     ~NetworkServer();
-
 
     void addCommand(command_t command);
     void addPackage(QByteArray package);
@@ -25,7 +24,6 @@ public:
 signals:
     void signalClientsAreConnected(int);
     void signalCommandFromClient(command_t);
-
 
 private slots:
 
@@ -40,7 +38,6 @@ private slots:
 
     void sendMessage(QTcpSocket* socket, command_type type);
 
-
 private:
     QTcpServer* m_server;
     QSet<QTcpSocket*> connection_set;
@@ -48,10 +45,7 @@ private:
 
     QTimer *m_timer;
 
-    bool bInit;
-
-
-
+    STRNode Node;
 };
 
 #endif // NETWORK_H

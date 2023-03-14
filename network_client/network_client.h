@@ -14,7 +14,7 @@ class Q_DECL_EXPORT NetworkClient : public QObject
 {
     Q_OBJECT
 public:
-    NetworkClient(QString Host, qint32 Port);
+    NetworkClient(STRNode NodeInfo);
     ~NetworkClient();
 
     bool connectToSTRServer();
@@ -44,9 +44,7 @@ private:
     bool bConnected;
     QTimer *m_timer;
 
-    QString sHost;
-    qint32 iPort;
-    bool bInit;
+    STRNode Node;
 };
 
 #endif // NETWORKCLIENT_H

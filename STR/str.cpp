@@ -4,35 +4,58 @@
 #include <QScreen>
 #include <QSharedPointer>
 
+#include <QTextCodec>
+
 STR::STR(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::STR)
     , bServerNode(true)
-    , sHostName("127.0.0.1")
-    , iHostPort(8080)
     , multiScreen(false)
 {
     ui->setupUi(this);
 
+    CurrentNode.name      = "STR application";
+    CurrentNode.host      = "127.0.0.1";
+    CurrentNode.port      = 2001;
+    CurrentNode.frameType = 0;
+    CurrentNode.mainNode  = 2;
+    CurrentNode.ID        = 2;
+    CurrentNode.isServer  = bServerNode;
+
     QString SettingsName = qApp->applicationDirPath() + "/config.ini";
     QSettings settings(SettingsName, QSettings::IniFormat);
+    settings.setIniCodec(QTextCodec::codecForName("UTF-8"));
     if(QFile::exists(SettingsName))    {
         settings.beginGroup("MAIN_SETTINGS");
-        bServerNode   = (settings.value("server", false)).toBool();
-        sHostName     = (settings.value("host", "127.0.0.1")).toString();
-        iHostPort     = (settings.value("port", 8080)).toInt();
-        multiScreen   = (settings.value("multiScreen", false)).toBool();
+
+        CurrentNode.isServer  = (settings.value("server", false)).toBool();
+        CurrentNode.host      = (settings.value("host", "127.0.0.1")).toString();
+        CurrentNode.port      = (settings.value("port", 2001)).toInt();
+        CurrentNode.name      = (settings.value("name", "Клиент приложения")).toString();
+        CurrentNode.frameType = (settings.value("frameType", 0)).toInt();
+        CurrentNode.mainNode  = (settings.value("mainNode", 2)).toInt();
+        CurrentNode.ID        = (settings.value("nodeID", 0)).toInt();
+        multiScreen           = (settings.value("multiScreen", false)).toBool();
+
         settings.endGroup();
         qDebug() << "config loaded";
     } else {
         settings.beginGroup("MAIN_SETTINGS");
-        settings.setValue("server",false);
+
+        settings.setValue("server",true);
         settings.setValue("host","127.0.0.1");
-        settings.setValue("port",8080);
+        settings.setValue("port",2001);
+        settings.setValue("name","Сервер приложения");
+        settings.setValue("frameType",0);
+        settings.setValue("mainNode",2);
+        settings.setValue("nodeID",2);
         settings.setValue("multiScreen",false);
+
         settings.endGroup();
         qDebug() << "config created";
     }
+
+    bServerNode = CurrentNode.isServer;
 
         // get screen data
     QScreen* screen = QApplication::screens().at(0);
@@ -64,28 +87,23 @@ STR::STR(QWidget *parent)
     connect(this,&STR::stop,core,&CoreQ::stopCore);
 
     object_manager = new ManagerQ(core);
-    //initModels();
 
     if(bServerNode) {
-        STR_server = new NetworkServer(iHostPort);
+        STR_server = new NetworkServer(CurrentNode);
         connect(STR_server,SIGNAL(signalClientsAreConnected(int)),
                 this,SLOT(setClientInformation(int)));
         connect(STR_server,SIGNAL(signalCommandFromClient(command_t)),
                 this,SLOT(slotReadCommand(command_t)));
-        //for(int i = 0; i < modelList.size(); i++) {
-        //    ConnectModel(modelList[i]);
-        //}
         for(int i = 0; i < object_manager->modelList.size(); i++) {
             ConnectModel(object_manager->modelList[i]);
         }
-
-        this->setWindowTitle("STR is runned as SERVER");
     } else {
-        STR_client = new NetworkClient(sHostName, iHostPort);
+        STR_client = new NetworkClient(CurrentNode);
         connect(STR_client, SIGNAL(signalPackageFromServer(QByteArray)),
                 core, SLOT(setCoreFromPackage(QByteArray)));
-        this->setWindowTitle("STR is runned as CLIENT");
     }
+
+    this->setWindowTitle(CurrentNode.name);
 
     STR_timer = new QTimer;
     STR_timer->setInterval(100);
@@ -103,7 +121,6 @@ STR::~STR()
     STR_timer->disconnect();
 
     delete core;
-    //delete model_test;
 
     if(bServerNode) {
         delete STR_server;
@@ -118,11 +135,7 @@ void STR::slotTimer()   {
     if(bServerNode == true)   {
         STR_server->addPackage(core->getPackage());
     } else {
-/*
-        if(STR_client->isConnected() == false)  {
-            STR_client->connectToSTRServer();
-        }
-*/
+
     }
 
     if(core->isStartCore()) {
@@ -134,7 +147,7 @@ void STR::slotTimer()   {
 
 void STR::setClientInformation(int value)
 {
-    this->setWindowTitle(QString("STR is runned as SERVER. %1 clients are connected").arg(value));
+    this->setWindowTitle(QString("%1. Подключено %2 клиентов").arg(CurrentNode.name).arg(value));
 }
 
 void STR::slotOpenFormat(STRformat_enum name)
@@ -188,15 +201,15 @@ void STR::on_pushButtonStop_clicked()
     }
 }
 
-void STR::on_pushButtonTest_clicked()
+void STR::on_action_triggered()
+{
+    exit(0);
+}
+
+void STR::on_pushButtonContainer_clicked()
 {
     formatcontainer *f = new formatcontainer(object_manager->getFormatList());
     connect(f, SIGNAL(signalOpenFormat(STRformat_enum)),this, SLOT(slotOpenFormat(STRformat_enum)));
     ui->mdiArea->addSubWindow(f);
     f->show();
-}
-
-void STR::on_action_triggered()
-{
-    exit(0);
 }

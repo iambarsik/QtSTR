@@ -34,7 +34,31 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
+INCLUDEPATH += $$PWD/../core
+DEPENDPATH  += $$PWD/../core
+win32: LIBS += -L$$PWD/../_output/ -lCore
+
+INCLUDEPATH += $$PWD/../manager
+DEPENDPATH  += $$PWD/../manager
+win32: LIBS += -L$$PWD/../_output/ -lmanager
+
+INCLUDEPATH += $$PWD/../templates/model
+DEPENDPATH  += $$PWD/../templates/model
+win32: LIBS += -L$$PWD/../_output/ -lmodel
+
+INCLUDEPATH += $$PWD/../templates/format
+DEPENDPATH  += $$PWD/../templates/format
+win32: LIBS += -L$$PWD/../_output/ -lformat
+
+INCLUDEPATH += $$PWD/../network_server
+DEPENDPATH  += $$PWD/../network_server
+win32: LIBS += -L$$PWD/../_output/ -lnetwork_server
+
+INCLUDEPATH += $$PWD/../network_client
+DEPENDPATH  += $$PWD/../network_client
+win32: LIBS += -L$$PWD/../_output/ -lnetwork_client
+
 BIN_PATH = $$PWD/../_output/
 DESTDIR = $${BIN_PATH}/
 
-include($${_PRO_FILE_PWD_}/common.pri)
+#include($${_PRO_FILE_PWD_}/common.pri)

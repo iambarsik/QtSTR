@@ -1,9 +1,11 @@
 #include "network_client.h"
 
-NetworkClient::NetworkClient(QString Host, qint32 Port)
+NetworkClient::NetworkClient(STRNode NodeInfo)
     : bConnected(false)
 {
     socket = new QTcpSocket(this);
+
+    Node = NodeInfo;
 
     connect(socket, SIGNAL(readyRead()), this, SLOT(readyRead()));
     connect(socket, &QTcpSocket::disconnected, this, &NetworkClient::connectToSTRServer);
@@ -14,8 +16,6 @@ NetworkClient::NetworkClient(QString Host, qint32 Port)
     connect(m_timer,SIGNAL(timeout()),this,SLOT(OnTimer()));
 
         // try to connect to server
-    sHost = Host;
-    iPort = Port;
     connectToSTRServer();
 }
 
@@ -28,7 +28,7 @@ NetworkClient::~NetworkClient()
 bool NetworkClient::connectToSTRServer()
 {
     try {
-        socket->connectToHost(sHost,iPort);
+        socket->connectToHost(Node.host,Node.port);
 
         if(socket->waitForConnected())  {
             qDebug() << "Connected to Server";
@@ -44,7 +44,6 @@ bool NetworkClient::connectToSTRServer()
         bConnected = false;
         return false;
     }
-    bInit = false;
     return true;
 }
 
@@ -81,7 +80,6 @@ void NetworkClient::readyRead()   {
                 header = bufferRead.mid(0,8);
 
                 int iSize = header.mid( 1, 1).toHex().toInt(&status, 16);
-                int iMainNode = header.mid( 2, 1).toHex().toInt(&status, 16);
                 int iClientNode = header.mid( 3, 1).toHex().toInt(&status, 16);
                 int iNetworkFlag = header.mid( 4, 1).toHex().toInt(&status, 16);
                 int iFrameType = header.mid( 5, 1).toHex().toInt(&status, 16);
@@ -146,39 +144,32 @@ void NetworkClient::sendMessage(command_type type)   {
         case com_init:
             if(socket)  {
                 if(socket->isOpen())    {
-                    //if(bInited == false) {
-                        int MainNode  = 2;
-                        int NodeID    = 1;
-                        int FrameType = 0x15;
-                        QString name  = "127.0.0.1";
 
-                        dataSend.clear();
+                    dataSend.clear();
 
-                        dataSend.append((char) 0x00);
-                        dataSend.append((char) 13 + name.size());
-                        dataSend.append((char) MainNode);
-                        dataSend.append((char) NodeID);
-                        dataSend.append((char) 0x01);
-                        dataSend.append((char) FrameType);
-                        dataSend.append((char) 0x00);
-                        dataSend.append((char) 0x00);
+                    dataSend.append((char) 0x00);
+                    dataSend.append((char) 13 + Node.name.size());
+                    dataSend.append((char) Node.mainNode);
+                    dataSend.append((char) Node.ID);
+                    dataSend.append((char) 0x01);
+                    dataSend.append((char) Node.frameType);
+                    dataSend.append((char) 0x00);
+                    dataSend.append((char) 0x00);
 
-                        dataSend.append((char) 0xC0);
-                        dataSend.append((char) 0x00);
-                        dataSend.append((char) 0x00);
-                        dataSend.append((char) 0x03);
+                    dataSend.append((char) 0xC0);
+                    dataSend.append((char) 0x00);
+                    dataSend.append((char) 0x00);
+                    dataSend.append((char) 0x03);
 
-                        dataSend.append(name);
-                        dataSend.append((char) 0x00);
+                    dataSend.append(Node.name);
+                    dataSend.append((char) 0x00);
 
-                        //bInited = true;
+                    qDebug() << "Init command is sent";
 
-                        qDebug() << "Init command is sent";
+                    socket->write(dataSend);
+                    socket->flush();
+                    socket->waitForBytesWritten(10000);
 
-                        socket->write(dataSend);
-                        socket->flush();
-                        socket->waitForBytesWritten(10000);
-                    //}
                 } else {
                     qDebug() << "Socket doesn't seem to be opened";
                 }
@@ -191,10 +182,10 @@ void NetworkClient::sendMessage(command_type type)   {
             // 8 байт - заголовок кадра
             dataSend.append((char) 0x00);           // 1 байт - 0
             dataSend.append((char) 0x08);           // 2 байт - текущая длинна кадра в байтах (включая размер заголовка)
-            dataSend.append((char) 0x02);           // 3 байт - идентификатор получателя
-            dataSend.append((char) 0x01);           // 4 байт - идентификатор отправителя (номер узла)
+            dataSend.append((char) Node.mainNode);  // 3 байт - идентификатор получателя
+            dataSend.append((char) Node.ID);        // 4 байт - идентификатор отправителя (номер узла)
             dataSend.append((char) 0x01);           // 5 байт - флаг кадра ( 0 - я сервер, 1 - я клинет )
-            dataSend.append((char) 0x00);           // 6 байт - тип кадра 0
+            dataSend.append((char) Node.frameType); // 6 байт - тип кадра
             dataSend.append((char) 0x00);           // 7 байт - зарезервировано
             dataSend.append((char) 0x00);           // 8 байт - зарезервировано
             socket->write(dataSend);
@@ -202,34 +193,32 @@ void NetworkClient::sendMessage(command_type type)   {
             socket->waitForBytesWritten(10000);
         break;
         case com_buffer:
-            //if(bufferSend.size() == 12){
-                dataSend.clear();
-                    // 8 байт - заголовок кадра
-                dataSend.append((char) 0x00);                       // 1 байт - 0
-                dataSend.append((char) 8 + bufferSend.size() + 4);  // 2 байт - текущая длинна кадра в байтах (размер заголовка + size + time)
-                dataSend.append((char) 0x02);                       // 3 байт - идентификатор получателя
-                dataSend.append((char) 0x01);                       // 4 байт - идентификатор отправителя (номер узла)
-                dataSend.append((char) 0x01);                       // 5 байт - флаг кадра ( 0 - я сервер, 1 - я клинет )
-                dataSend.append((char) 0x7F);                       // 6 байт - тип кадра 0
-                dataSend.append((char) 0x00);                       // 7 байт - зарезервировано
-                dataSend.append((char) 0x00);                       // 8 байт - зарезервировано
+            dataSend.clear();
+                // 8 байт - заголовок кадра
+            dataSend.append((char) 0x00);                       // 1 байт - 0
+            dataSend.append((char) 8 + bufferSend.size() + 4);  // 2 байт - текущая длинна кадра в байтах (размер заголовка + size + time)
+            dataSend.append((char) Node.mainNode);              // 3 байт - идентификатор получателя
+            dataSend.append((char) Node.ID);                    // 4 байт - идентификатор отправителя (номер узла)
+            dataSend.append((char) 0x01);                       // 5 байт - флаг кадра ( 0 - я сервер, 1 - я клинет )
+            dataSend.append((char) Node.frameType);             // 6 байт - тип кадра
+            dataSend.append((char) 0x00);                       // 7 байт - зарезервировано
+            dataSend.append((char) 0x00);                       // 8 байт - зарезервировано
 
-                    // 4 байта - модельное время команды в миллисекундах
-                bufferSend.append((char) 0x00);
-                bufferSend.append((char) 0x00);
-                bufferSend.append((char) 0x00);
-                bufferSend.append((char) 0x00);
+                // 4 байта - модельное время команды в миллисекундах
+            bufferSend.append((char) 0x00);
+            bufferSend.append((char) 0x00);
+            bufferSend.append((char) 0x00);
+            bufferSend.append((char) 0x00);
 
-                dataSend.append(bufferSend);
+            dataSend.append(bufferSend);
 
-                qDebug() << "Length: " << dataSend.length();
+            qDebug() << "Length: " << dataSend.length();
 
-                bufferSend.clear(); // очищаем буфер
+            bufferSend.clear(); // очищаем буфер
 
-                socket->write(dataSend);
-                socket->flush();
-                socket->waitForBytesWritten(10000);
-            //}
+            socket->write(dataSend);
+            socket->flush();
+            socket->waitForBytesWritten(10000);
         break;
         case command_type::com_package:
 

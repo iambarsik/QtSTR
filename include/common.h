@@ -79,7 +79,8 @@ enum command_type   {
     com_init,
     com_buffer,
     com_ping,
-    com_package
+    com_package,
+    com_na
 };
 
 // connecting of commands and model owners
@@ -112,4 +113,15 @@ struct STRFormatObjectContainer {
     QString title;
     QList <STRFormatSystemContainer<T>> SystemContainer;
 
+};
+
+// node description
+struct STRNode  {
+    QString name;
+    QString host;
+	bool isServer;
+    int port;
+    int ID;
+	int mainNode;
+    int frameType;
 };

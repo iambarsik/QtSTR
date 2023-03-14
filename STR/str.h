@@ -64,17 +64,13 @@ private slots:
     void on_pushButtonStart_clicked();
     void on_pushButtonStop_clicked();
 
-    void on_pushButtonTest_clicked();
-
     void on_action_triggered();
+
+    void on_pushButtonContainer_clicked();
 
 private:
 
     QTimer *STR_timer;
-
-    //M_TEST *model_test;
-    //QList<ModelQ *> modelList;
-    //QList<FormatQ *> formatList;
 
     Ui::STR *ui;
 
@@ -82,9 +78,10 @@ private:
 
     NetworkServer *STR_server;
     NetworkClient *STR_client;
+
+    STRNode CurrentNode;
+
     bool bServerNode;
-    QString sHostName;
-    int iHostPort;
     bool multiScreen;
 };
 #endif // STR_H

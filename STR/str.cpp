@@ -136,6 +136,11 @@ void STR::slotTimer()   {
         STR_server->addPackage(core->getPackage());
     } else {
 
+        if(STR_client->isConnected())   {
+            this->setWindowTitle(QString("%1. Подключено к серверу").arg(CurrentNode.name));
+        } else {
+            this->setWindowTitle(QString("%1. Нет соединения с сервером").arg(CurrentNode.name));
+        }
     }
 
     if(core->isStartCore()) {

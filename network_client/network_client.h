@@ -17,23 +17,23 @@ public:
     NetworkClient(STRNode NodeInfo);
     ~NetworkClient();
 
-    bool connectToSTRServer();
     bool isConnected() { return bConnected; }
 
     void addCommand(command_t command);
-
 
 signals:
     void signalPackageFromServer(QByteArray);
 
 private slots:
-
     void OnTimer();
-
     void discardSocket();
     void getErrorCode(QAbstractSocket::SocketError errorCode);
 
     void readyRead();
+
+    void connectToServer();
+    void slotStopReConnect();
+    void slotStartReConnect();
 
     void sendMessage(command_type type);
 
@@ -43,6 +43,7 @@ private:
 
     bool bConnected;
     QTimer *m_timer;
+    QTimer *reconnect_timer;
 
     STRNode Node;
 };

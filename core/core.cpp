@@ -1,6 +1,7 @@
 #include "core.h"
 
-CoreQ::CoreQ()
+CoreQ::CoreQ():
+    str_system_start(false)
 {
     core_test_var1 = 0;
     core_test_var2 = 1;

@@ -1,6 +1,7 @@
 #include "core.h"
 
-CoreQ::CoreQ()
+CoreQ::CoreQ():
+    str_system_start(false)
 {
 //<CONSTRUCTOR_SECTION>	
 //</CONSTRUCTOR_SECTION>

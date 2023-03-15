@@ -8,15 +8,21 @@ NetworkClient::NetworkClient(STRNode NodeInfo)
     Node = NodeInfo;
 
     connect(socket, SIGNAL(readyRead()), this, SLOT(readyRead()));
-    connect(socket, &QTcpSocket::disconnected, this, &NetworkClient::connectToSTRServer);
+    connect(socket,SIGNAL(connected()),this,SLOT(slotStopReConnect()));
+    connect(socket,SIGNAL(disconnected()),this,SLOT(slotStartReConnect()));
     connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(getErrorCode(QAbstractSocket::SocketError)));
 
     m_timer = new QTimer;
     m_timer->setInterval(100);
     connect(m_timer,SIGNAL(timeout()),this,SLOT(OnTimer()));
 
+    reconnect_timer = new QTimer;
+    reconnect_timer->setInterval(1000);
+    connect(reconnect_timer,SIGNAL(timeout()),this,SLOT(connectToServer()));
+    reconnect_timer->start();
+
         // try to connect to server
-    connectToSTRServer();
+    //connectToServer();
 }
 
 NetworkClient::~NetworkClient()
@@ -25,26 +31,19 @@ NetworkClient::~NetworkClient()
     socket->deleteLater();
 }
 
-bool NetworkClient::connectToSTRServer()
+void NetworkClient::connectToServer()
 {
-    try {
-        socket->connectToHost(Node.host,Node.port);
-
-        if(socket->waitForConnected())  {
-            qDebug() << "Connected to Server";
-            qDebug() << QString("System :: connected to server");
-            sendMessage(command_type::com_init);
-            bConnected = true;
-            m_timer->start();
-        } else {
-            qDebug() << "System :: connecting ERROR";
-        }
-    } catch (QException *e) {
-        qDebug() << e->what();
-        bConnected = false;
-        return false;
+    qDebug() << " trying to connect";
+    socket->connectToHost(Node.host,Node.port);
+    if(!socket->waitForConnected(10))  {
+        qDebug() << "System :: connecting ERROR";
+        return;
     }
-    return true;
+    m_timer->start();
+    bConnected = true;
+    qDebug() << "Connected to Server";
+    qDebug() << QString("System :: connected to server");
+    sendMessage(command_type::com_init);
 }
 
 void NetworkClient::OnTimer()  {
@@ -65,7 +64,6 @@ void NetworkClient::getErrorCode(QAbstractSocket::SocketError errorCode)   {
 
 
 void NetworkClient::readyRead()   {
-
     if( socket->state() == QAbstractSocket::ConnectedState )    {
         bufferRead = socket->readAll();
         //qDebug() << bufferRead;
@@ -136,12 +134,22 @@ void NetworkClient::readyRead()   {
     }
 }
 
+void NetworkClient::slotStopReConnect()
+{
+    reconnect_timer->stop();
+    m_timer->start();
+}
 
+void NetworkClient::slotStartReConnect()
+{
+    bConnected = false;
+    reconnect_timer->start();
+    m_timer->stop();
+}
 
 void NetworkClient::sendMessage(command_type type)   {
-
     switch(type)    {
-        case com_init:
+        case com_init: {
             if(socket)  {
                 if(socket->isOpen())    {
 
@@ -176,8 +184,8 @@ void NetworkClient::sendMessage(command_type type)   {
             } else {
                 qDebug() << "Not connected";
             }
-        break;
-        case com_ping:
+        } break;
+        case com_ping: {
             dataSend.clear();
             // 8 байт - заголовок кадра
             dataSend.append((char) 0x00);           // 1 байт - 0
@@ -191,8 +199,8 @@ void NetworkClient::sendMessage(command_type type)   {
             socket->write(dataSend);
             socket->flush();
             socket->waitForBytesWritten(10000);
-        break;
-        case com_buffer:
+        } break;
+        case com_buffer: {
             dataSend.clear();
                 // 8 байт - заголовок кадра
             dataSend.append((char) 0x00);                       // 1 байт - 0
@@ -219,13 +227,15 @@ void NetworkClient::sendMessage(command_type type)   {
             socket->write(dataSend);
             socket->flush();
             socket->waitForBytesWritten(10000);
-        break;
-        case command_type::com_package:
+        } break;
+        case command_type::com_package: {
 
-        break;
+        } break;
+        case command_type::com_na:  {
+
+        } break;
     }
 }
-
 
 void NetworkClient::addCommand(command_t command)  {
 

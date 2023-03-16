@@ -1,11 +1,12 @@
 #include "network_client.h"
 
-NetworkClient::NetworkClient(STRNode NodeInfo)
+NetworkClient::NetworkClient(STRNode NodeInfo, bool NA_mode)
     : bConnected(false)
 {
     socket = new QTcpSocket(this);
 
     Node = NodeInfo;
+    bNA_MODE = NA_mode;
 
     connect(socket, SIGNAL(readyRead()), this, SLOT(readyRead()));
     connect(socket,SIGNAL(connected()),this,SLOT(slotStopReConnect()));
@@ -21,8 +22,6 @@ NetworkClient::NetworkClient(STRNode NodeInfo)
     connect(reconnect_timer,SIGNAL(timeout()),this,SLOT(connectToServer()));
     reconnect_timer->start();
 
-        // try to connect to server
-    //connectToServer();
 }
 
 NetworkClient::~NetworkClient()
@@ -68,15 +67,89 @@ void NetworkClient::readyRead()   {
         bufferRead = socket->readAll();
         //qDebug() << bufferRead;
 
-        if(bufferRead.length() >= 32)   {
+            // use default STR mode for network
+        /*
+         * 8 bytes header
+         * 4 bytes command
+         * 8 bytes par 1 (for double supporting)
+         * 8 bytes par 2 (for double supporting)
+         * 4 bytes model time sending
+         *
+         * total: 32 bytes for default STR command
+         *
+         * */
+        if(bNA_MODE == false)    {
+            if(bufferRead.length() >= 32)   {
+                bool status;
+                int iPackageFlag = bufferRead.mid(0,1).toHex().toInt(&status,16);
+                if(iPackageFlag == 0)   {
+                    QByteArray header;
+                    header = bufferRead.mid(0,8);
 
-            bool status;
-            int iPackageFlag = bufferRead.mid(0,1).toHex().toInt(&status,16);
-            if(iPackageFlag == 0)   {
+                    int iSize = header.mid( 1, 1).toHex().toInt(&status, 16);
+                    int iClientNode = header.mid( 3, 1).toHex().toInt(&status, 16);
+                    int iNetworkFlag = header.mid( 4, 1).toHex().toInt(&status, 16);
+                    int iFrameType = header.mid( 5, 1).toHex().toInt(&status, 16);
 
+                    if(iNetworkFlag == 0)   {
+                        qDebug() << "Have got package from server ID: " << iClientNode;
+                    } else {
+                        qDebug() << "Have got package from client ID: " << iClientNode;
+                    }
+                    qDebug() << "Size = " << iSize << " FrameType = " << iFrameType;
+                    qDebug() << socket->bytesAvailable();
+
+                        // checking for default command
+                    if(iSize == 32) {
+                        QByteArray frame;
+                        frame = bufferRead.mid(0,32);
+                        frame.remove(0,8);
+
+                        if(frame.length() >= 24)    {                   // checking if frame is correct
+                            bool status;
+                            uint iCommand = frame.mid( 0,4).toHex().toInt(&status,16);
+
+                            STR_PARAM p1 = STR_PARAM(frame.mid( 4,8));
+                            STR_PARAM p2 = STR_PARAM(frame.mid( 12,8));
+
+                            qint32 iTime    = frame.mid(20,4).toHex().toInt(&status,16);
+                            bufferRead.remove(0, 32);                   // delete frame from buffer
+
+                            qDebug() << "Input command from STR : " << iCommand << " p1: " << p1.toInt() << " p2: " << p2.toInt() << " time: " << iTime;
+                        }
+                    } else {
+                        /*
+                        // try to unpack big package
+                        */
+                    }
+                } else {
+                    // have got core package flag
+                    bool status;
+                    QByteArray package = bufferRead;
+                    package.remove(0,8); // delete header
+                    int iPackageSize = package.mid(0,4).toHex().toInt(&status,16);
+                    qDebug() << "Package size = " << iPackageSize;
+                    package.remove(0,4); // delete 4 bytes about package size
+                    emit signalPackageFromServer(package);
+                }
+            }
+        } else {
+
+            // working with NA abonent
+            /*
+            * 8 bytes header
+            * 4 bytes command
+            * 4 bytes par 1 (double not suppots)
+            * 4 bytes par 2 (double not suppots)
+            * 4 bytes model time sending
+            *
+            * total: 24 bytes for default NA or TRIO command
+            *
+            * */
+            if(bufferRead.length() >= 24)   {
+                bool status;
                 QByteArray header;
                 header = bufferRead.mid(0,8);
-
                 int iSize = header.mid( 1, 1).toHex().toInt(&status, 16);
                 int iClientNode = header.mid( 3, 1).toHex().toInt(&status, 16);
                 int iNetworkFlag = header.mid( 4, 1).toHex().toInt(&status, 16);
@@ -91,44 +164,34 @@ void NetworkClient::readyRead()   {
                 qDebug() << socket->bytesAvailable();
 
                     // checking for default command
-                if(iSize == 32) {
+                if(iSize == 24) {
                     QByteArray frame;
-                    frame = bufferRead.mid(0,32);
+                    frame = bufferRead.mid(0,24);
                     frame.remove(0,8);
-
-                    if(frame.length() >= 24)    {                   // checking if frame is correct
+                    if(frame.length() >= 16)    {                   // checking if frame is correct
                         bool status;
                         uint iCommand = frame.mid( 0,4).toHex().toInt(&status,16);
 
-                        STR_PARAM p1 = STR_PARAM(frame.mid( 4,8));
-                        STR_PARAM p2 = STR_PARAM(frame.mid( 12,8));
+                        qint32 p1 = frame.mid( 4,4).toHex().toInt(&status, 16);
+                        qint32 p2 = frame.mid( 8,4).toHex().toInt(&status, 16);
 
-                        //qint64 iPar1    = frame.mid( 4,8).toHex().toInt(&status,16);
-                        //qint64 iPar2    = frame.mid( 8,8).toHex().toInt(&status,16);
-                        qint32 iTime    = frame.mid(20,4).toHex().toInt(&status,16);
-                        bufferRead.remove(0, 32);                   // delete frame from buffer
+                        qint32 iTime    = frame.mid(12,4).toHex().toInt(&status,16);
+                        bufferRead.remove(0, 24);                   // delete frame from buffer
 
-                        qDebug() << "Input command : " << iCommand << " p1: " << p1.toInt() << " p2: " << p2.toInt() << " time: " << iTime;
+                        emit signalCommandFromNA({iCommand, p1, p2, iTime});
+
+                        qDebug() << "Input command from NA : " << iCommand << " p1: " << p1 << " p2: " << p2 << " time: " << iTime;
                     }
                 } else {
-                    /*
-                    // try to unpack big package
-                    qDebug() << "Recieved package";
-                    QByteArray package = bufferRead.mid(0,iSize);
-                    package.remove(0,8);
-                    //qDebug() << package;
-                    emit signalPackageFromServer(package);
-                    */
+                    // have got core package flag
+                    QByteArray package = bufferRead;
+                    package.remove(0,8); // delete header
+                    qDebug() << "Input package from NA. Size = " << iSize;
+                    uint iCommand = package.mid( 0,4).toHex().toInt(&status,16);
+                    package.remove(0,4); // delete command
+
+                    emit signalPackageFromNA({iCommand,package});
                 }
-            } else {
-                // have got core package flag
-                bool status;
-                QByteArray package = bufferRead;
-                package.remove(0,8); // delete header
-                int iPackageSize = package.mid(0,4).toHex().toInt(&status,16);
-                qDebug() << "Package size = :" << iPackageSize;
-                package.remove(0,4); // delete 4 bytes about package size
-                emit signalPackageFromServer(package);
             }
         }
     }

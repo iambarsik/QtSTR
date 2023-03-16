@@ -1,9 +1,5 @@
 #include "str.h"
-
-void STR::initModels()   {
-    //model_test = new M_TEST(core);
-    //modelList.push_back(model_test);
-}
+#include <QTextCodec>
 
 void STR::ConnectModel(ModelQ *model)
 {

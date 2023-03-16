@@ -74,6 +74,20 @@ struct command_t {
     qint32 time;
 };
 
+// template command for na to STR
+struct command_na {
+    uint code;
+    qint32 par1;
+    qint32 par2;
+    qint32 time;
+};
+
+// template package for na to STR
+struct package_na {
+    uint code;
+    QByteArray data;
+};
+
 // list of socket commands
 enum command_type   {
     com_init,
@@ -124,4 +138,5 @@ struct STRNode  {
     int ID;
 	int mainNode;
     int frameType;
+	QString modelName;
 };

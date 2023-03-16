@@ -29,6 +29,8 @@ public:
     void set() override;
     void update() override;
     void ReadCommand(command_t command) override;
+    void ReadCommandFromNA(command_na command) override;
+    void ReadPackageFromNA(package_na package) override;
 
 private:
     qint64 test_var1;

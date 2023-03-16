@@ -3,8 +3,8 @@
 
 #include <QScreen>
 #include <QSharedPointer>
-
 #include <QTextCodec>
+#include <QMessageBox>
 
 STR::STR(QWidget *parent)
     : QMainWindow(parent)
@@ -23,11 +23,67 @@ STR::STR(QWidget *parent)
     CurrentNode.isServer  = bServerNode;
 
     QString SettingsName = qApp->applicationDirPath() + "/config.ini";
-    QSettings settings(SettingsName, QSettings::IniFormat);
-    settings.setIniCodec(QTextCodec::codecForName("UTF-8"));
-    if(QFile::exists(SettingsName))    {
-        settings.beginGroup("MAIN_SETTINGS");
 
+    if(!QFile::exists(SettingsName))    {
+        QStringList ini;
+        ini.append("[MAIN_SETTINGS]");
+        ini.append("host=127.0.0.1");
+        ini.append("port=2001");
+        ini.append("name=Сервер приложения");
+        ini.append("frameType=0");
+        ini.append("mainNode=2");
+        ini.append("nodeID=2");
+        ini.append("multiScreen=false");
+        ini.append("");
+        ini.append("#[NODE-9]");
+        ini.append("#nodeID=9");
+        ini.append("#host=127.0.0.1");
+        ini.append("#port=2009");
+        ini.append("#title=NODE NAME");
+        ini.append("#frameType=9");
+        ini.append("#modelName=M_TEST");
+        ini.append("");
+
+        QFile file(SettingsName);
+        file.open(QIODevice::WriteOnly);
+        QTextStream out(&file);
+        out.setCodec(QTextCodec::codecForName("UTF-8"));
+        for(int i = 0; i < ini.size(); i++)   {
+            out << ini[i] << "\n";
+        }
+        file.close();
+
+        qDebug() << "STR :: config created";
+
+    } else {
+
+            // get nodes list
+        QStringList groupNames;
+
+        QFile file(SettingsName);
+        if(!file.open(QFile::ReadWrite))    {
+            qDebug() << "STR :: config file open error";
+            QMessageBox::warning(this, "Ошибка!", "Невозможно открыть файл конфигурации!", QMessageBox::Yes);
+            exit(EXIT_FAILURE);
+        }
+
+        QTextStream out(&file);
+        QString line;
+        while (out.readLineInto(&line)) {
+            if(line.startsWith("[NODE-"))   {
+                QString s = line;
+                s.remove('[');
+                s.remove(']');
+                groupNames.append(s);
+            }
+            line.clear();
+        }
+        file.close();
+
+        QSettings settings(SettingsName, QSettings::IniFormat);
+        settings.setIniCodec(QTextCodec::codecForName("UTF-8"));
+
+        settings.beginGroup("MAIN_SETTINGS");
         CurrentNode.isServer  = (settings.value("server", false)).toBool();
         CurrentNode.host      = (settings.value("host", "127.0.0.1")).toString();
         CurrentNode.port      = (settings.value("port", 2001)).toInt();
@@ -36,23 +92,23 @@ STR::STR(QWidget *parent)
         CurrentNode.mainNode  = (settings.value("mainNode", 2)).toInt();
         CurrentNode.ID        = (settings.value("nodeID", 0)).toInt();
         multiScreen           = (settings.value("multiScreen", false)).toBool();
-
         settings.endGroup();
-        qDebug() << "config loaded";
-    } else {
-        settings.beginGroup("MAIN_SETTINGS");
 
-        settings.setValue("server",true);
-        settings.setValue("host","127.0.0.1");
-        settings.setValue("port",2001);
-        settings.setValue("name","Сервер приложения");
-        settings.setValue("frameType",0);
-        settings.setValue("mainNode",2);
-        settings.setValue("nodeID",2);
-        settings.setValue("multiScreen",false);
+        for(int i = 0; i < groupNames.size(); i++)  {
+            STRNode node;
 
-        settings.endGroup();
-        qDebug() << "config created";
+            settings.beginGroup(groupNames[i]);
+            node.ID        = (settings.value("nodeID", 0)).toInt();
+            node.host      = (settings.value("host", "127.0.0.1")).toString();
+            node.port      = (settings.value("port", 2001)).toInt();
+            node.name      = (settings.value("title", "unknown")).toString();
+            node.frameType = (settings.value("frameType", 0)).toInt();
+            node.modelName = (settings.value("modelName", "M_TEST")).toString();
+            settings.endGroup();
+
+            NA_Nodes.push_back(node);
+        }
+        qDebug() << "STR :: config loaded";
     }
 
     bServerNode = CurrentNode.isServer;
@@ -89,6 +145,7 @@ STR::STR(QWidget *parent)
     object_manager = new ManagerQ(core);
 
     if(bServerNode) {
+
         STR_server = new NetworkServer(CurrentNode);
         connect(STR_server,SIGNAL(signalClientsAreConnected(int)),
                 this,SLOT(setClientInformation(int)));
@@ -97,6 +154,25 @@ STR::STR(QWidget *parent)
         for(int i = 0; i < object_manager->modelList.size(); i++) {
             ConnectModel(object_manager->modelList[i]);
         }
+
+        qDebug() << NA_Nodes.size();
+        for(int i = 0; i < NA_Nodes.size(); i++)    {
+            NetworkClient * client = new NetworkClient(NA_Nodes[i],true);
+
+                // search and connect model owner for each NA node
+            for(int m = 0; m < object_manager->modelList.size(); m++)   {
+                if(object_manager->modelList[m]->getModelName() == NA_Nodes[i].modelName)   {
+                    connect(client,SIGNAL(signalCommandFromNA(command_na)),
+                            object_manager->modelList[m],SLOT(ReadCommandFromNA(command_na)));
+                    connect(client,SIGNAL(signalPackageFromNA(package_na)),
+                            object_manager->modelList[m],SLOT(ReadPackageFromNA(package_na)));
+                    break;
+                }
+            }
+
+            NA_client.push_back(client);
+        }
+
     } else {
         STR_client = new NetworkClient(CurrentNode);
         connect(STR_client, SIGNAL(signalPackageFromServer(QByteArray)),
@@ -111,7 +187,6 @@ STR::STR(QWidget *parent)
             this, SLOT(slotTimer()));
 
     STR_timer->start();
-
 }
 
 STR::~STR()
@@ -208,7 +283,7 @@ void STR::on_pushButtonStop_clicked()
 
 void STR::on_action_triggered()
 {
-    exit(0);
+    exit(EXIT_SUCCESS);
 }
 
 void STR::on_pushButtonContainer_clicked()

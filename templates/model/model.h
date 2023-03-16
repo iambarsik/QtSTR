@@ -21,6 +21,9 @@ public:
     void virtual ReadCommand(command_t command) { Q_UNUSED(command); }
 
     uint getID() { return id; }
+    QString getModelName() { return model_name; }
+    QString getModelObject() { return model_object; }
+    QString getModelSystem() { return model_system; }
 
     void sendCommandToModel(uint command, STR_PARAM par1, STR_PARAM par2, qint32 time);
 	
@@ -28,6 +31,8 @@ public slots:
     void start();
     void stop();
     void run();
+    virtual void ReadCommandFromNA(command_na command) { Q_UNUSED(command); };
+    virtual void ReadPackageFromNA(package_na package) { Q_UNUSED(package); };
 
 signals:
      void signalCommandSended(command_t); 

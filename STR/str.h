@@ -8,6 +8,8 @@
 #include <QByteArray>
 #include <QSettings>
 #include <QFile>
+#include <QVariant>
+#include <QMessageBox>
 
 #include <core.h>
 #include <manager.h>
@@ -17,10 +19,8 @@
 #include <network_server.h>
 #include "../include/common.h"
 
+    // include headers of system widgets
 #include "formatcontainer.h"
-
-//#include "../network_client/network_client.h"
-//#include "../network_server/network_server.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class STR; }
@@ -42,7 +42,6 @@ public:
     bool isMultiScreen() { return multiScreen; }
 
 private:
-    void initModels();
 
 signals:
     void init();
@@ -59,7 +58,6 @@ public slots:
     void slotOpenFormat(STRformat_enum name);
 
 private slots:
-
     void on_pushButtonSet_clicked();
     void on_pushButtonStart_clicked();
     void on_pushButtonStop_clicked();
@@ -80,6 +78,8 @@ private:
     NetworkClient *STR_client;
 
     STRNode CurrentNode;
+    QList<STRNode> NA_Nodes;
+    QList<NetworkClient *> NA_client;
 
     bool bServerNode;
     bool multiScreen;

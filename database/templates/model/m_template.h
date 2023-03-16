@@ -26,6 +26,10 @@ public:
     void update() override;
     void ReadCommand(command_t command) override;
 	
+		// uncomment and implement if model must work with NA node
+    //void ReadCommandFromNA(command_na command) override;
+    //void ReadPackageFromNA(package_na package) override;
+	
 public:
 	// write code here
 	

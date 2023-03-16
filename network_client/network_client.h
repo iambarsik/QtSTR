@@ -14,7 +14,7 @@ class Q_DECL_EXPORT NetworkClient : public QObject
 {
     Q_OBJECT
 public:
-    NetworkClient(STRNode NodeInfo);
+    NetworkClient(STRNode NodeInfo, bool NA_mode = false);
     ~NetworkClient();
 
     bool isConnected() { return bConnected; }
@@ -23,6 +23,8 @@ public:
 
 signals:
     void signalPackageFromServer(QByteArray);
+    void signalCommandFromNA(command_na);
+    void signalPackageFromNA(package_na);
 
 private slots:
     void OnTimer();
@@ -42,6 +44,7 @@ private:
     QByteArray bufferRead, bufferSend, dataSend;
 
     bool bConnected;
+    bool bNA_MODE;
     QTimer *m_timer;
     QTimer *reconnect_timer;
 

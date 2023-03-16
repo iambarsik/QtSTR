@@ -133,7 +133,29 @@ void M_TEST::ReadCommand(command_t command)
         break;
     }
 
-    qDebug() << "Got command " << command.code << "in model ID = : " << getID();
+    qDebug() << "Got command " << command.code << "in model ID =  " << getID();
 
     outputToCore();
+}
+
+void M_TEST::ReadCommandFromNA(command_na command)
+{
+    qint32 p1 = command.par1;
+    qint32 p2 = command.par2;
+    switch(command.code)    {
+        default:
+
+        break;
+    }
+    qDebug() << "Got command from NA" << command.code << p1 << p2 << "in model ID = " << getID();
+}
+
+void M_TEST::ReadPackageFromNA(package_na package)
+{
+    switch(package.code)    {
+        default:
+
+        break;
+    }
+    qDebug() << "Got package from NA" << package.code << package.data << "in model ID = " << getID();
 }

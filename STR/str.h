@@ -21,10 +21,12 @@
 
     // include headers of system widgets
 #include "formatcontainer.h"
+#include "networkstate.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class STR; }
 QT_END_NAMESPACE
+
 
 class STR : public QMainWindow
 {
@@ -48,6 +50,7 @@ signals:
     void set();
     void start();
     void stop();
+    void networkStateChanged();
 
 private slots:
     void slotTimer();
@@ -56,15 +59,18 @@ private slots:
 public slots:
     void setClientInformation(int value);
     void slotOpenFormat(STRformat_enum name);
+    void updateNetworkState();
 
 private slots:
     void on_pushButtonSet_clicked();
     void on_pushButtonStart_clicked();
     void on_pushButtonStop_clicked();
-
     void on_action_triggered();
-
     void on_pushButtonContainer_clicked();
+
+    void on_action_container_triggered();
+
+    void on_action_networkstate_triggered();
 
 private:
 
@@ -80,6 +86,7 @@ private:
     STRNode CurrentNode;
     QList<STRNode> NA_Nodes;
     QList<NetworkClient *> NA_client;
+    QList<STRNodeInfo> NodeInfo;
 
     bool bServerNode;
     bool multiScreen;

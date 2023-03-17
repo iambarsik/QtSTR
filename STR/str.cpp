@@ -27,6 +27,7 @@ STR::STR(QWidget *parent)
     if(!QFile::exists(SettingsName))    {
         QStringList ini;
         ini.append("[MAIN_SETTINGS]");
+        ini.append("server=true");
         ini.append("host=127.0.0.1");
         ini.append("port=2001");
         ini.append("name=Сервер приложения");
@@ -157,7 +158,10 @@ STR::STR(QWidget *parent)
 
         qDebug() << NA_Nodes.size();
         for(int i = 0; i < NA_Nodes.size(); i++)    {
-            NetworkClient * client = new NetworkClient(NA_Nodes[i],true);
+            NetworkClient * client = new NetworkClient(NA_Nodes[i],true);            
+
+            connect(client,SIGNAL(clientConnected()),this,SLOT(updateNetworkState()));
+            connect(client,SIGNAL(clientDisconnected()),this,SLOT(updateNetworkState()));
 
                 // search and connect model owner for each NA node
             for(int m = 0; m < object_manager->modelList.size(); m++)   {
@@ -173,6 +177,8 @@ STR::STR(QWidget *parent)
             NA_client.push_back(client);
         }
 
+        updateNetworkState();
+
     } else {
         STR_client = new NetworkClient(CurrentNode);
         connect(STR_client, SIGNAL(signalPackageFromServer(QByteArray)),
@@ -187,6 +193,8 @@ STR::STR(QWidget *parent)
             this, SLOT(slotTimer()));
 
     STR_timer->start();
+
+    this->setWindowIcon(QIcon(":/images/ico.ico"));
 }
 
 STR::~STR()
@@ -196,6 +204,7 @@ STR::~STR()
     STR_timer->disconnect();
 
     delete core;
+    delete object_manager;
 
     if(bServerNode) {
         delete STR_server;
@@ -228,6 +237,7 @@ void STR::slotTimer()   {
 void STR::setClientInformation(int value)
 {
     this->setWindowTitle(QString("%1. Подключено %2 клиентов").arg(CurrentNode.name).arg(value));
+
 }
 
 void STR::slotOpenFormat(STRformat_enum name)
@@ -237,6 +247,7 @@ void STR::slotOpenFormat(STRformat_enum name)
     ui->mdiArea->addSubWindow(f);
     f->show();
 }
+
 
 void STR::on_pushButtonSet_clicked()
 {
@@ -290,6 +301,22 @@ void STR::on_pushButtonContainer_clicked()
 {
     formatcontainer *f = new formatcontainer(object_manager->getFormatList());
     connect(f, SIGNAL(signalOpenFormat(STRformat_enum)),this, SLOT(slotOpenFormat(STRformat_enum)));
+    ui->mdiArea->addSubWindow(f);
+    f->show();
+}
+
+void STR::on_action_container_triggered()
+{
+    formatcontainer *f = new formatcontainer(object_manager->getFormatList());
+    connect(f, SIGNAL(signalOpenFormat(STRformat_enum)),this, SLOT(slotOpenFormat(STRformat_enum)));
+    ui->mdiArea->addSubWindow(f);
+    f->show();
+}
+
+void STR::on_action_networkstate_triggered()
+{
+    networkstate *f = new networkstate(&NodeInfo);
+    connect(this, SIGNAL(networkStateChanged()),f, SLOT(update()));
     ui->mdiArea->addSubWindow(f);
     f->show();
 }

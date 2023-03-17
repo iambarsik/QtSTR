@@ -19,12 +19,17 @@ public:
 
     bool isConnected() { return bConnected; }
 
+    QString getNodeName() { return Node.name; }
+    int getID() { return Node.ID; }
+
     void addCommand(command_t command);
 
 signals:
     void signalPackageFromServer(QByteArray);
     void signalCommandFromNA(command_na);
     void signalPackageFromNA(package_na);
+    void clientConnected();
+    void clientDisconnected();
 
 private slots:
     void OnTimer();

@@ -61,3 +61,38 @@ void STR::slotReadCommand(command_t command)
         STR_client->addCommand(command);
     }
 }
+
+void STR::updateNetworkState()
+{
+    if(NodeInfo.isEmpty())  {
+        for(int i = 0; i < NA_client.size(); i++)   {
+            STRNodeInfo n;
+            n.name = NA_client[i]->getNodeName();
+            n.ID = NA_client[i]->getID();
+            n.isNA = true;
+            n.state = NA_client[i]->isConnected();
+            NodeInfo.push_back(n);
+        }
+    } else {
+        for(int i = 0; i < NA_client.size(); i++)   {
+            for(int j = 0; j < NodeInfo.size(); j++)    {
+                if(NA_client[i]->getID() == NodeInfo[j].ID) {
+
+                        // if it was connected before, set the lost connection state
+                    if(NA_client[i]->isConnected() == false && NodeInfo[j].state > 0)  {
+                        NodeInfo[j].state = 2;
+                    } else {
+                        NodeInfo[j].state = NA_client[i]->isConnected();
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    emit networkStateChanged();
+
+    for(int i = 0; i < NodeInfo.size(); i++)    {
+        qDebug() << NodeInfo[i].ID;
+    }
+}

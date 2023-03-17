@@ -9,7 +9,8 @@ formatcontainer::formatcontainer(QList<STRFormat<STRformat_enum>> formatList, QW
     this->formatList = formatList;
     ui->setupUi(this);
     this->setWindowTitle("Контейнер форматов");
-    initData();
+    initData();    
+    this->setWindowIcon(QIcon(":/images/ico.ico"));
 }
 
 formatcontainer::~formatcontainer()

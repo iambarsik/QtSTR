@@ -19,14 +19,17 @@ SOURCES += \
     formatcontainer.cpp \
     functions.cpp \
     main.cpp \
+    networkstate.cpp \
     str.cpp
 
 HEADERS += \
     formatcontainer.h \
+    networkstate.h \
     str.h
 
 FORMS += \
     formatcontainer.ui \
+    networkstate.ui \
     str.ui
 
 # Default rules for deployment.
@@ -62,3 +65,6 @@ BIN_PATH = $$PWD/../_output/
 DESTDIR = $${BIN_PATH}/
 
 #include($${_PRO_FILE_PWD_}/common.pri)
+
+RESOURCES += \
+    resource.qrc

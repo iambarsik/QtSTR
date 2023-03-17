@@ -140,3 +140,11 @@ struct STRNode  {
     int frameType;
 	QString modelName;
 };
+
+// node info and state for state format
+struct STRNodeInfo	{
+	QString name;
+	int ID;
+	int state;	// 0 - disconnected, 1 - connected, 2 - lost connection
+	bool isNA;
+};

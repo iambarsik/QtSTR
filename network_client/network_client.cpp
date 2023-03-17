@@ -43,6 +43,7 @@ void NetworkClient::connectToServer()
     qDebug() << "Connected to Server";
     qDebug() << QString("System :: connected to server");
     sendMessage(command_type::com_init);
+    emit clientConnected();
 }
 
 void NetworkClient::OnTimer()  {
@@ -205,7 +206,8 @@ void NetworkClient::slotStopReConnect()
 
 void NetworkClient::slotStartReConnect()
 {
-    bConnected = false;
+    bConnected = false;    
+    emit clientDisconnected();
     reconnect_timer->start();
     m_timer->stop();
 }

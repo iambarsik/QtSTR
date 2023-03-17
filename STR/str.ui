@@ -66,6 +66,15 @@
     <property name="autoFillBackground">
      <bool>false</bool>
     </property>
+    <property name="verticalScrollBarPolicy">
+     <enum>Qt::ScrollBarAsNeeded</enum>
+    </property>
+    <property name="viewMode">
+     <enum>QMdiArea::SubWindowView</enum>
+    </property>
+    <property name="documentMode">
+     <bool>false</bool>
+    </property>
    </widget>
    <widget class="QPushButton" name="pushButtonContainer">
     <property name="geometry">
@@ -142,7 +151,15 @@
     <addaction name="action_3"/>
     <addaction name="action"/>
    </widget>
+   <widget class="QMenu" name="menu_2">
+    <property name="title">
+     <string>Системные форматы</string>
+    </property>
+    <addaction name="action_container"/>
+    <addaction name="action_networkstate"/>
+   </widget>
    <addaction name="menu"/>
+   <addaction name="menu_2"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="action_1">
@@ -163,6 +180,16 @@
   <action name="action">
    <property name="text">
     <string>Выход</string>
+   </property>
+  </action>
+  <action name="action_container">
+   <property name="text">
+    <string>Контейнер форматов</string>
+   </property>
+  </action>
+  <action name="action_networkstate">
+   <property name="text">
+    <string>Состояние сети</string>
    </property>
   </action>
  </widget>

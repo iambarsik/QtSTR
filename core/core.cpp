@@ -30,8 +30,11 @@ void CoreQ::pushInt(qint64 value)
 
 void CoreQ::popInt(QByteArray &arr, qint64 &variable)
 {
-    bool ok;
-    variable = arr.mid(0,sizeof(variable)).toHex().toInt(&ok,16); arr.remove(0,sizeof (variable));
+    //bool ok;
+    //variable = arr.mid(0,sizeof(variable)).toHex().toInt(&ok,16); arr.remove(0,sizeof (variable));
+    QDataStream stream(arr);
+    stream >> variable;
+    arr.remove(0,sizeof (variable));
 }
 
 QByteArray CoreQ::pushDouble(double value)

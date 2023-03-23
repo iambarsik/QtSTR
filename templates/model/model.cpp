@@ -29,7 +29,7 @@ void ModelQ::run()
     outputToCore();
 }
 
-void ModelQ::sendCommandToModel(uint command, STR_PARAM par1, STR_PARAM par2, qint32 time)
+void ModelQ::sendCommandToModel(uint command, STR_PARAM par1, STR_PARAM par2, uint time)
 {
     command_t com;
     com.code = command;
@@ -37,4 +37,14 @@ void ModelQ::sendCommandToModel(uint command, STR_PARAM par1, STR_PARAM par2, qi
     com.par2 = par2;
     com.time = time;
     emit signalCommandSended(com);
+}
+
+void ModelQ::sendCommandToNode(qint32 nodeId, uint command, qint32 par1, qint32 par2, uint time)
+{
+    command_na com;
+    com.code = command;
+    com.par1 = par1;
+    com.par2 = par2;
+    com.time = time;
+    emit signalCommandToNodeSended(nodeId, com);
 }

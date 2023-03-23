@@ -16,18 +16,22 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    eventmonitor.cpp \
     formatcontainer.cpp \
-    functions.cpp \
     main.cpp \
     networkstate.cpp \
-    str.cpp
+    str.cpp \
+    str_functions.cpp \
+    str_ui_slots.cpp
 
 HEADERS += \
+    eventmonitor.h \
     formatcontainer.h \
     networkstate.h \
     str.h
 
 FORMS += \
+    eventmonitor.ui \
     formatcontainer.ui \
     networkstate.ui \
     str.ui

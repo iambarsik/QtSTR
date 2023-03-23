@@ -10,6 +10,7 @@
 #include <QFile>
 #include <QVariant>
 #include <QMessageBox>
+#include <QTime>
 
 #include <core.h>
 #include <manager.h>
@@ -17,11 +18,14 @@
 #include <format.h>
 #include <network_client.h>
 #include <network_server.h>
+
 #include "../include/common.h"
+#include "../include/network_def.h"
 
     // include headers of system widgets
 #include "formatcontainer.h"
 #include "networkstate.h"
+#include "eventmonitor.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class STR; }
@@ -42,6 +46,9 @@ public:
     void ConnectModel(ModelQ *model);
     void ConnectFormat(FormatQ *format);
     bool isMultiScreen() { return multiScreen; }
+    void pushEvent(uint code, qint32 time);
+
+    qint32 timeNow();
 
 private:
 
@@ -51,15 +58,20 @@ signals:
     void start();
     void stop();
     void networkStateChanged();
+    void eventListChanged();
 
 private slots:
     void slotTimer();
     void slotReadCommand(command_t command);
 
+
 public slots:
+    void slotNewClientConnected(QTcpSocket *sock);
     void setClientInformation(int value);
     void slotOpenFormat(STRformat_enum name);
     void updateNetworkState();
+
+    void sendCommandToNode(qint32 nodeId, uint command, qint32 par1, qint32 par2);
 
 private slots:
     void on_pushButtonSet_clicked();
@@ -71,6 +83,10 @@ private slots:
     void on_action_container_triggered();
 
     void on_action_networkstate_triggered();
+
+    void on_pushButtonContainer_2_clicked();
+
+    void on_action_eventmonitor_triggered();
 
 private:
 

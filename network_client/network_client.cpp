@@ -42,13 +42,13 @@ void NetworkClient::connectToServer()
     bConnected = true;
     qDebug() << "Connected to Server";
     qDebug() << QString("System :: connected to server");
-    sendMessage(command_type::com_init);
+    sendMessage(network_command_type::com_init);
     emit clientConnected();
 }
 
 void NetworkClient::OnTimer()  {
     if(bConnected == true)  {
-        sendMessage(command_type::com_ping);
+        sendMessage(network_command_type::com_ping);
     }
 }
 
@@ -93,9 +93,9 @@ void NetworkClient::readyRead()   {
                     int iFrameType = header.mid( 5, 1).toHex().toInt(&status, 16);
 
                     if(iNetworkFlag == 0)   {
-                        qDebug() << "Have got package from server ID: " << iClientNode;
+                        qDebug() << "Have got message from server ID: " << iClientNode;
                     } else {
-                        qDebug() << "Have got package from client ID: " << iClientNode;
+                        qDebug() << "Have got message from client ID: " << iClientNode;
                     }
                     qDebug() << "Size = " << iSize << " FrameType = " << iFrameType;
                     qDebug() << socket->bytesAvailable();
@@ -108,7 +108,7 @@ void NetworkClient::readyRead()   {
 
                         if(frame.length() >= 24)    {                   // checking if frame is correct
                             bool status;
-                            uint iCommand = frame.mid( 0,4).toHex().toInt(&status,16);
+                            uint iCommand = frame.mid( 0,4).toHex().toUInt(&status,16);
 
                             STR_PARAM p1 = STR_PARAM(frame.mid( 4,8));
                             STR_PARAM p2 = STR_PARAM(frame.mid( 12,8));
@@ -117,6 +117,7 @@ void NetworkClient::readyRead()   {
                             bufferRead.remove(0, 32);                   // delete frame from buffer
 
                             qDebug() << "Input command from STR : " << iCommand << " p1: " << p1.toInt() << " p2: " << p2.toInt() << " time: " << iTime;
+                            emit signalCommandFromServer({iCommand, p1, p2, iTime});
                         }
                     } else {
                         /*
@@ -188,7 +189,7 @@ void NetworkClient::readyRead()   {
                     QByteArray package = bufferRead;
                     package.remove(0,8); // delete header
                     qDebug() << "Input package from NA. Size = " << iSize;
-                    uint iCommand = package.mid( 0,4).toHex().toInt(&status,16);
+                    qint32 iCommand = package.mid( 0,4).toHex().toInt(&status,16);
                     package.remove(0,4); // delete command
 
                     emit signalPackageFromNA({iCommand,package});
@@ -212,7 +213,7 @@ void NetworkClient::slotStartReConnect()
     m_timer->stop();
 }
 
-void NetworkClient::sendMessage(command_type type)   {
+void NetworkClient::sendMessage(network_command_type type)   {
     switch(type)    {
         case com_init: {
             if(socket)  {
@@ -293,11 +294,36 @@ void NetworkClient::sendMessage(command_type type)   {
             socket->flush();
             socket->waitForBytesWritten(10000);
         } break;
-        case command_type::com_package: {
+        case network_command_type::com_package: {
 
         } break;
-        case command_type::com_na:  {
+        case network_command_type::com_na:  {
+            dataSend.clear();
+                // 8 байт - заголовок кадра
+            dataSend.append((char) 0x00);                       // 1 байт - 0
+            dataSend.append((char) 8 + bufferSend.size() + 4);  // 2 байт - текущая длинна кадра в байтах (размер заголовка + size + time)
+            dataSend.append((char) Node.mainNode);              // 3 байт - идентификатор получателя
+            dataSend.append((char) Node.ID);                    // 4 байт - идентификатор отправителя (номер узла)
+            dataSend.append((char) 0x01);                       // 5 байт - флаг кадра ( 0 - я сервер, 1 - я клинет )
+            dataSend.append((char) Node.frameType);             // 6 байт - тип кадра
+            dataSend.append((char) 0x00);                       // 7 байт - зарезервировано
+            dataSend.append((char) 0x00);                       // 8 байт - зарезервировано
 
+                // 4 байта - модельное время команды в миллисекундах
+            bufferSend.append((char) 0x00);
+            bufferSend.append((char) 0x00);
+            bufferSend.append((char) 0x00);
+            bufferSend.append((char) 0x00);
+
+            dataSend.append(bufferSend);
+
+            qDebug() << "Length: " << dataSend.length();
+
+            bufferSend.clear(); // очищаем буфер
+
+            socket->write(dataSend);
+            socket->flush();
+            socket->waitForBytesWritten(10000);
         } break;
     }
 }
@@ -313,7 +339,27 @@ void NetworkClient::addCommand(command_t command)  {
     bufferSend.append(command.par2.data);
 
     qDebug() << QString("Command is sent: %1 %2 %3").arg(command.code).arg(command.par1.toInt()).arg(command.par2.toInt());
-    sendMessage(command_type::com_buffer);
+    sendMessage(network_command_type::com_buffer);
+}
+
+void NetworkClient::addCommandForNA(qint32 command, qint32 par1, qint32 par2)
+{
+    bufferSend.clear();
+    bufferSend.append((command >> 24) & 0xFF);
+    bufferSend.append((command >> 16) & 0xFF);
+    bufferSend.append((command >> 8)  & 0xFF);
+    bufferSend.append((command) & 0xFF);
+    bufferSend.append((par1 >> 24) & 0xFF);
+    bufferSend.append((par1 >> 16) & 0xFF);
+    bufferSend.append((par1 >> 8)  & 0xFF);
+    bufferSend.append((par1) & 0xFF);
+    bufferSend.append((par2 >> 24) & 0xFF);
+    bufferSend.append((par2 >> 16) & 0xFF);
+    bufferSend.append((par2 >> 8)  & 0xFF);
+    bufferSend.append((par2) & 0xFF);
+
+    qDebug() << QString("Command for NA is sent: %1 %2 %3").arg(command).arg(par1).arg(par2);
+    sendMessage(network_command_type::com_na);
 }
 
 

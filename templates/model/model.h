@@ -20,12 +20,13 @@ public:
     void virtual outputToCore() {}
     void virtual ReadCommand(command_t command) { Q_UNUSED(command); }
 
-    uint getID() { return id; }
+    qint32 getID() { return id; }
     QString getModelName() { return model_name; }
     QString getModelObject() { return model_object; }
     QString getModelSystem() { return model_system; }
 
-    void sendCommandToModel(uint command, STR_PARAM par1, STR_PARAM par2, qint32 time);
+    void sendCommandToModel(uint command, STR_PARAM par1, STR_PARAM par2, uint time = 0);
+    void sendCommandToNode(qint32 nodeId, uint command, qint32 par1, qint32 par2, uint time = 0);
 	
 public slots:
     void start();
@@ -35,11 +36,12 @@ public slots:
     virtual void ReadPackageFromNA(package_na package) { Q_UNUSED(package); };
 
 signals:
-     void signalCommandSended(command_t); 
+    void signalCommandSended(command_t);
+    void signalCommandToNodeSended(uint, command_na);
 	 
 private:
     QTimer *model_timer;
-    uint id = -1;
+    qint32 id = -1;
     QString model_name = "unnamed";
     QString model_object = "noobject";
     QString model_system = "nosystem";

@@ -33,3 +33,13 @@ void FormatQ::sendCommandToModel(uint command, STR_PARAM par1, STR_PARAM par2, q
     emit signalCommandSended(com);
 }
 
+void FormatQ::sendCommandToNode(qint32 nodeId, uint command, qint32 par1, qint32 par2, qint32 time)
+{
+    command_na com;
+    com.code = command;
+    com.par1 = par1;
+    com.par2 = par2;
+    com.time = time;
+    emit signalCommandToNodeSended(nodeId, com);
+}
+

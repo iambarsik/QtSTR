@@ -10,6 +10,7 @@
 #include <QTimer>
 
 #include "../include/common.h"
+#include "../include/network_def.h"
 
 class Q_DECL_EXPORT NetworkServer : public QObject
 {
@@ -19,9 +20,13 @@ public:
     ~NetworkServer();
 
     void addCommand(command_t command);
+    void addCommandToClient(QTcpSocket* sock, command_t command);
     void addPackage(QByteArray package);
 
+    qint32 getClientCount() { return connection_set.size(); }
+
 signals:
+    void signalNewClientConnected(QTcpSocket *sock);
     void signalClientsAreConnected(int);
     void signalCommandFromClient(command_t);
 
@@ -36,7 +41,7 @@ private slots:
 
     void readyRead();
 
-    void sendMessage(QTcpSocket* socket, command_type type);
+    void sendMessage(QTcpSocket* socket, network_command_type type);
 
 private:
     QTcpServer* m_server;

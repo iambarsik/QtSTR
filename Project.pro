@@ -1,5 +1,8 @@
 TEMPLATE = subdirs
 
+HEADERS =   include/common.h \
+            include/network_def.h
+
 SUBDIRS = core \
                   manager \
                   network_client \
@@ -10,3 +13,4 @@ SUBDIRS = core \
 		  
 qtHaveModule(widgets) {
     SUBDIRS += formats/F_TEST
+    SUBDIRS += formats/F_TESTFORM

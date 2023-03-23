@@ -11,7 +11,19 @@ public:
 		data.append(arr);
 	}
 	STR_PARAM() {}	
-    STR_PARAM(int value) {
+    STR_PARAM(uint value) {
+        data.clear();
+		qint64 v = (qint64) value;
+        data.append(static_cast<char>((v >> 56) & 0xFF));
+        data.append(static_cast<char>((v >> 48) & 0xFF));
+        data.append(static_cast<char>((v >> 40) & 0xFF));
+        data.append(static_cast<char>((v >> 32) & 0xFF));
+        data.append(static_cast<char>((v >> 24) & 0xFF));
+        data.append(static_cast<char>((v >> 16) & 0xFF));
+        data.append(static_cast<char>((v >> 8) & 0xFF));
+        data.append(static_cast<char>((v >> 0) & 0xFF));
+    }
+    STR_PARAM(qint32 value) {
         data.clear();
 		qint64 v = (qint64) value;
         data.append(static_cast<char>((v >> 56) & 0xFF));
@@ -50,9 +62,11 @@ public:
         data.append(static_cast<char>(0x00));
         data.append(value);
     }
-    qint32 toInt()   {
-        bool status;
-        return data.mid(0,data.size()).toHex().toInt(&status,16);
+    qint64 toInt()   {
+        qint64 result;
+        QDataStream stream(&data, QIODevice::ReadOnly);
+        stream >> result;
+        return result;
     }
     double toDouble()   {
         double result;
@@ -84,12 +98,12 @@ struct command_na {
 
 // template package for na to STR
 struct package_na {
-    uint code;
+    qint32 code;
     QByteArray data;
 };
 
 // list of socket commands
-enum command_type   {
+enum network_command_type   {
     com_init,
     com_buffer,
     com_ping,
@@ -100,14 +114,20 @@ enum command_type   {
 // connecting of commands and model owners
 struct STRCommand {
     uint code;
-    uint model_owner;
+    qint32 model_owner;
     QString description;
+};
+
+// command info for event monitor
+struct EventCommand	{
+	uint code;
+	qint32 time;
 };
 
 // format info for container
 template <typename T>
 struct STRFormat	{
-    uint id;
+    qint32 id;
     T name;
     QString title;
     QString object;
@@ -134,17 +154,17 @@ struct STRNode  {
     QString name;
     QString host;
 	bool isServer;
-    int port;
-    int ID;
-	int mainNode;
-    int frameType;
+    qint32 port;
+    qint32 ID;
+	qint32 mainNode;
+    qint32 frameType;
 	QString modelName;
 };
 
 // node info and state for state format
 struct STRNodeInfo	{
 	QString name;
-	int ID;
-	int state;	// 0 - disconnected, 1 - connected, 2 - lost connection
+	qint32 ID;
+	qint32 state;	// 0 - disconnected, 1 - connected, 2 - lost connection
 	bool isNA;
 };

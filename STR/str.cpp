@@ -152,11 +152,22 @@ STR::STR(QWidget *parent)
                 this,SLOT(setClientInformation(int)));
         connect(STR_server,SIGNAL(signalCommandFromClient(command_t)),
                 this,SLOT(slotReadCommand(command_t)));
+
+
+        /*
+         *  need to fix non complete synchronizing
+         *
+         *
+        connect(STR_server,SIGNAL(signalNewClientConnected(QTcpSocket*)),
+                this, SLOT(slotNewClientConnected(QTcpSocket*)));
+        */
+
         for(int i = 0; i < object_manager->modelList.size(); i++) {
             ConnectModel(object_manager->modelList[i]);
         }
 
-        qDebug() << NA_Nodes.size();
+
+            // init and connect all NA clients that are read from config file
         for(int i = 0; i < NA_Nodes.size(); i++)    {
             NetworkClient * client = new NetworkClient(NA_Nodes[i],true);            
 
@@ -183,6 +194,9 @@ STR::STR(QWidget *parent)
         STR_client = new NetworkClient(CurrentNode);
         connect(STR_client, SIGNAL(signalPackageFromServer(QByteArray)),
                 core, SLOT(setCoreFromPackage(QByteArray)));
+
+        connect(STR_client,SIGNAL(signalCommandFromServer(command_t)),
+                this,SLOT(slotReadCommand(command_t)));
     }
 
     this->setWindowTitle(CurrentNode.name);
@@ -248,75 +262,3 @@ void STR::slotOpenFormat(STRformat_enum name)
     f->show();
 }
 
-
-void STR::on_pushButtonSet_clicked()
-{
-    if(bServerNode) {
-        emit stop();
-        emit set();
-    } else {
-        command_t com;
-        com.code = 0x80000001;
-        com.par1 = STR_PARAM((qint64)0);
-        com.par2 = STR_PARAM((qint64)0);
-        com.time = 0;
-        STR_client->addCommand(com);
-    }
-}
-
-void STR::on_pushButtonStart_clicked()
-{
-    if(bServerNode) {
-        emit start();
-    } else {
-        command_t com;
-        com.code = 0x80000002;
-        com.par1 = STR_PARAM((qint64)0);
-        com.par2 = STR_PARAM((qint64)0);
-        com.time = 0;
-        STR_client->addCommand(com);
-    }
-}
-
-void STR::on_pushButtonStop_clicked()
-{
-    if(bServerNode) {
-        emit stop();
-    } else {
-        command_t com;
-        com.code = 0x80000003;
-        com.par1 = STR_PARAM((qint64)0);
-        com.par2 = STR_PARAM((qint64)0);
-        com.time = 0;
-        STR_client->addCommand(com);
-    }
-}
-
-void STR::on_action_triggered()
-{
-    exit(EXIT_SUCCESS);
-}
-
-void STR::on_pushButtonContainer_clicked()
-{
-    formatcontainer *f = new formatcontainer(object_manager->getFormatList());
-    connect(f, SIGNAL(signalOpenFormat(STRformat_enum)),this, SLOT(slotOpenFormat(STRformat_enum)));
-    ui->mdiArea->addSubWindow(f);
-    f->show();
-}
-
-void STR::on_action_container_triggered()
-{
-    formatcontainer *f = new formatcontainer(object_manager->getFormatList());
-    connect(f, SIGNAL(signalOpenFormat(STRformat_enum)),this, SLOT(slotOpenFormat(STRformat_enum)));
-    ui->mdiArea->addSubWindow(f);
-    f->show();
-}
-
-void STR::on_action_networkstate_triggered()
-{
-    networkstate *f = new networkstate(&NodeInfo);
-    connect(this, SIGNAL(networkStateChanged()),f, SLOT(update()));
-    ui->mdiArea->addSubWindow(f);
-    f->show();
-}

@@ -16,13 +16,15 @@ public:
 
     CoreQ *core;
 
-    uint getID() { return id; }
+    qint32 getID() { return id; }
 
-    void sendCommandToModel(uint command, STR_PARAM par1, STR_PARAM par2, qint32 time);
+    void sendCommandToModel(uint command, STR_PARAM par1, STR_PARAM par2, qint32 time = 0);
+    void sendCommandToNode(qint32 nodeId, uint command, qint32 par1, qint32 par2, qint32 time = 0);
 
 
 signals:
      void signalCommandSended(command_t);
+     void signalCommandToNodeSended(uint, command_na);
 
 public slots:
     virtual void init() {};
@@ -30,7 +32,7 @@ public slots:
 
 private:     
      QTimer *format_timer;
-     uint id = -1;
+     qint32 id = -1;
      QString format_name = "unnamed";
      QString format_object = "noobject";
      QString format_system = "nosystem";

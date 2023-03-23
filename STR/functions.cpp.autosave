@@ -45,10 +45,16 @@ void STR::slotReadCommand(command_t command)
                     for(int i = 0; i < object_manager->modelList.size(); i++) {
                         if(model_id == object_manager->modelList[i]->getID())    {
                             object_manager->modelList[i]->ReadCommand(command);
+
+                                // adding to event monitor
+                            core->commands.addEvent(command.code, command.time);
+                            
+                            emit eventListChanged();
                             break;
                         }
                     }
-                    qDebug() << " " << core->commands.getCommandDescription(command.code);
+
+                    //qDebug() << " " << core->commands.getCommandDescription(command.code);
 
                 } else {
                     qDebug() << "STR :: Error in commands depending list";
@@ -94,5 +100,19 @@ void STR::updateNetworkState()
 
     for(int i = 0; i < NodeInfo.size(); i++)    {
         qDebug() << NodeInfo[i].ID;
+    }
+}
+
+void STR::sendCommandToNode(uint nodeId, qint32 command, qint32 par1, qint32 par2)
+{
+    if(bServerNode) {
+        for(int i = 0; i < NA_client.size(); i++)   {
+            if(NA_client[i]->getID() == nodeId) {
+                NA_client[i]->addCommandForNA(command, par1, par2);
+                break;
+            }
+        }
+    } else {
+
     }
 }

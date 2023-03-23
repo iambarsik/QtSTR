@@ -38,8 +38,14 @@ NetworkServer::~NetworkServer()
 void NetworkServer::addCommand(command_t command)
 {
     qDebug() << QString("Sending command: %1 %2 %3").arg(command.code).arg(command.par1.toInt()).arg(command.par2.toInt());
-    for(auto sock : connection_set) {
 
+    //qDebug () << command.par1.toInt();
+    //qDebug () << command.par2.toInt();
+    //
+    //qDebug () << command.par1.data;
+    //qDebug () << command.par2.data;
+
+    for(auto sock : connection_set) {
         bufferSend.clear();
         bufferSend.append((command.code >> 24) & 0xFF);
         bufferSend.append((command.code >> 16) & 0xFF);
@@ -48,8 +54,30 @@ void NetworkServer::addCommand(command_t command)
         bufferSend.append(command.par1.data);
         bufferSend.append(command.par2.data);
 
-        sendMessage(sock, command_type::com_buffer);
+        sendMessage(sock, network_command_type::com_buffer);
     }
+}
+
+void NetworkServer::addCommandToClient(QTcpSocket* sock, command_t command)
+{
+    qDebug() << QString("Sending single command: %1 %2 %3").arg(command.code).arg(command.par1.toInt()).arg(command.par2.toInt());
+
+    qDebug () << command.par1.toInt();
+    qDebug () << command.par2.toInt();
+
+    qDebug () << command.par1.data;
+    qDebug () << command.par2.data;
+
+    bufferSend.clear();
+    bufferSend.append((command.code >> 24) & 0xFF);
+    bufferSend.append((command.code >> 16) & 0xFF);
+    bufferSend.append((command.code >> 8)  & 0xFF);
+    bufferSend.append((command.code) & 0xFF);
+    bufferSend.append(command.par1.data);
+    bufferSend.append(command.par2.data);
+
+    sendMessage(sock, network_command_type::com_buffer);
+
 }
 
 void NetworkServer::addPackage(QByteArray package)
@@ -60,14 +88,14 @@ void NetworkServer::addPackage(QByteArray package)
     for(auto sock : connection_set) {
         bufferSend.clear();
         bufferSend.append(package);
-        sendMessage(sock, command_type::com_package);
+        sendMessage(sock, network_command_type::com_package);
     }
 }
 
 void NetworkServer::OnTimer()
 {
     for(auto sock : connection_set) {
-        sendMessage(sock, command_type::com_ping);
+        sendMessage(sock, network_command_type::com_ping);
     }
 }
 
@@ -83,9 +111,11 @@ void NetworkServer::appendToSocketList(QTcpSocket* socket) {
     connect(socket, &QTcpSocket::disconnected, this, &NetworkServer::discardSocket);
     connect(socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(getErrorCode(QAbstractSocket::SocketError)));
     qDebug() << QString("Node %1 descriptor has connected").arg(socket->socketDescriptor());
-    emit signalClientsAreConnected(connection_set.size());
 
-    sendMessage(socket, command_type::com_init);
+    sendMessage(socket, network_command_type::com_init);
+
+    emit signalNewClientConnected(socket);
+    emit signalClientsAreConnected(connection_set.size());
 }
 
 void NetworkServer::discardSocket()    {
@@ -118,16 +148,17 @@ void NetworkServer::readyRead() {
             bool status;
             QByteArray header;
             header = bufferRead.mid(0,8);
-            int iSize = header.mid( 1, 1).toHex().toInt(&status, 16);
-            int iMainNode = header.mid( 2, 1).toHex().toInt(&status, 16);
-            int iClientNode = header.mid( 3, 1).toHex().toInt(&status, 16);
-            int iNetworkFlag = header.mid( 4, 1).toHex().toInt(&status, 16);
-            int iFrameType = header.mid( 5, 1).toHex().toInt(&status, 16);
+
+            qint32 iSize = header.mid( 1, 1).toHex().toInt(&status, 16);
+            qint32 iMainNode = header.mid( 2, 1).toHex().toInt(&status, 16);
+            qint32 iClientNode = header.mid( 3, 1).toHex().toInt(&status, 16);
+            qint32 iNetworkFlag = header.mid( 4, 1).toHex().toInt(&status, 16);
+            qint32 iFrameType = header.mid( 5, 1).toHex().toInt(&status, 16);
 
             if(iNetworkFlag == 0)   {
-                qDebug() << "Have got package from server : " << iClientNode;
+                qDebug() << "Have got message from server : " << iClientNode;
             } else {
-                qDebug() << "Have got package from client: " << iClientNode;
+                qDebug() << "Have got message from client: " << iClientNode;
             }
             qDebug() << "Size = " << iSize << " FrameType = " << iFrameType;
 
@@ -144,8 +175,6 @@ void NetworkServer::readyRead() {
                     STR_PARAM p1 = STR_PARAM(frame.mid( 4,8));
                     STR_PARAM p2 = STR_PARAM(frame.mid( 12,8));
 
-                    //int iPar1    = frame.mid( 4,4).toHex().toInt(&status,16);
-                    //int iPar2    = frame.mid( 8,4).toHex().toInt(&status,16);
                     qint32 iTime    = frame.mid(20,4).toHex().toInt(&status,16);
                     bufferRead.remove(0, 32);                   // delete frame from buffer
 
@@ -159,7 +188,7 @@ void NetworkServer::readyRead() {
     }
 }
 
-void NetworkServer::sendMessage(QTcpSocket* socket, command_type type)    {
+void NetworkServer::sendMessage(QTcpSocket* socket, network_command_type type)    {
     switch(type)    {
         case com_init: {
 
@@ -232,7 +261,7 @@ void NetworkServer::sendMessage(QTcpSocket* socket, command_type type)    {
         case com_package: {
             dataSend.clear();
 
-            int iPackSize = bufferSend.size();
+            qint32 iPackSize = bufferSend.size();
 
             // 8 байт - заголовок кадра
             dataSend.append((char) 0x01);           // 1 байт - признак пакета для синхронизации ядра
@@ -258,7 +287,7 @@ void NetworkServer::sendMessage(QTcpSocket* socket, command_type type)    {
 
             socket->write(dataSend);
             socket->flush();
-            socket->waitForBytesWritten();
+            socket->waitForBytesWritten(10000);
         } break;
         case com_na: {
 

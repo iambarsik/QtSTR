@@ -5,6 +5,7 @@
 #include <QList>
 
 #include "../include/common.h"
+#include "../include/network_def.h"
 
 class Q_DECL_EXPORT CommandsQ : public QObject
 {
@@ -14,8 +15,11 @@ public:
     QString getCommandDescription(uint command_code);
     uint getModelOwner(uint command_code);
 
+    void addEvent(uint command, qint32 time);
+	
 private:
     QList <STRCommand> dependings;
+    QList <EventCommand> events;
 
 public:
 

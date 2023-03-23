@@ -132,6 +132,26 @@
      <string>Отраб. НУ</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="pushButtonContainer_2">
+    <property name="geometry">
+     <rect>
+      <x>860</x>
+      <y>2</y>
+      <width>161</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>ТЕСТОВАЯ КНОПКА</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -157,6 +177,7 @@
     </property>
     <addaction name="action_container"/>
     <addaction name="action_networkstate"/>
+    <addaction name="action_eventmonitor"/>
    </widget>
    <addaction name="menu"/>
    <addaction name="menu_2"/>
@@ -190,6 +211,11 @@
   <action name="action_networkstate">
    <property name="text">
     <string>Состояние сети</string>
+   </property>
+  </action>
+  <action name="action_eventmonitor">
+   <property name="text">
+    <string>Монитор событий</string>
    </property>
   </action>
  </widget>

@@ -53,8 +53,6 @@ void NetworkClient::OnTimer()  {
 }
 
 void NetworkClient::discardSocket()    {
-    //socket->deleteLater();
-    //socket=nullptr;
     qDebug() << "Disconnected from server!";
 }
 
@@ -65,7 +63,11 @@ void NetworkClient::getErrorCode(QAbstractSocket::SocketError errorCode)   {
 
 void NetworkClient::readyRead()   {
     if( socket->state() == QAbstractSocket::ConnectedState )    {
+
+        bufferRead.clear();
         bufferRead = socket->readAll();
+
+        //qDebug() << "Length: " << bufferRead.length();
         //qDebug() << bufferRead;
 
             // use default STR mode for network
@@ -81,49 +83,56 @@ void NetworkClient::readyRead()   {
          * */
         if(bNA_MODE == false)    {
             if(bufferRead.length() >= 32)   {
+
                 bool status;
                 int iPackageFlag = bufferRead.mid(0,1).toHex().toInt(&status,16);
+
                 if(iPackageFlag == 0)   {
-                    QByteArray header;
-                    header = bufferRead.mid(0,8);
 
-                    int iSize = header.mid( 1, 1).toHex().toInt(&status, 16);
-                    int iClientNode = header.mid( 3, 1).toHex().toInt(&status, 16);
-                    int iNetworkFlag = header.mid( 4, 1).toHex().toInt(&status, 16);
-                    int iFrameType = header.mid( 5, 1).toHex().toInt(&status, 16);
+                    for(int byte = 0; byte < bufferRead.length(); byte+= 32)    {
 
-                    if(iNetworkFlag == 0)   {
-                        qDebug() << "Have got message from server ID: " << iClientNode;
-                    } else {
-                        qDebug() << "Have got message from client ID: " << iClientNode;
-                    }
-                    qDebug() << "Size = " << iSize << " FrameType = " << iFrameType;
-                    qDebug() << socket->bytesAvailable();
+                        qDebug() << bufferRead.length();
 
-                        // checking for default command
-                    if(iSize == 32) {
-                        QByteArray frame;
-                        frame = bufferRead.mid(0,32);
-                        frame.remove(0,8);
+                        QByteArray header;
+                        header = bufferRead.mid(byte,8);
 
-                        if(frame.length() >= 24)    {                   // checking if frame is correct
-                            bool status;
-                            uint iCommand = frame.mid( 0,4).toHex().toUInt(&status,16);
+                        int iSize = header.mid( 1, 1).toHex().toInt(&status, 16);
+                        int iClientNode = header.mid( 3, 1).toHex().toInt(&status, 16);
+                        int iNetworkFlag = header.mid( 4, 1).toHex().toInt(&status, 16);
+                        int iFrameType = header.mid( 5, 1).toHex().toInt(&status, 16);
 
-                            STR_PARAM p1 = STR_PARAM(frame.mid( 4,8));
-                            STR_PARAM p2 = STR_PARAM(frame.mid( 12,8));
-
-                            qint32 iTime    = frame.mid(20,4).toHex().toInt(&status,16);
-                            bufferRead.remove(0, 32);                   // delete frame from buffer
-
-                            qDebug() << "Input command from STR : " << iCommand << " p1: " << p1.toInt() << " p2: " << p2.toInt() << " time: " << iTime;
-                            emit signalCommandFromServer({iCommand, p1, p2, iTime});
-                        }
-                    } else {
                         /*
-                        // try to unpack big package
+                        if(iNetworkFlag == 0)   {
+                            qDebug() << "Have got message from server ID: " << iClientNode;
+                        } else {
+                            qDebug() << "Have got message from client ID: " << iClientNode;
+                        }
                         */
+                        qDebug() << "Size = " << iSize << " FrameType = " << iFrameType;
+
+                            // checking for default command
+                        if(iSize == 32) {
+                            QByteArray frame;
+                            frame = bufferRead.mid(byte,32);
+                            frame.remove(0,8);
+
+                            if(frame.length() >= 24)    {                   // checking if frame is correct
+                                bool status;
+                                uint iCommand = frame.mid( 0,4).toHex().toUInt(&status,16);
+
+                                STR_PARAM p1 = STR_PARAM(frame.mid( 4,8));
+                                STR_PARAM p2 = STR_PARAM(frame.mid( 12,8));
+
+                                qint32 iTime    = frame.mid(20,4).toHex().toInt(&status,16);
+
+                                qDebug() << "Input command from STR : " << iCommand << " p1: " << p1.toInt() << " p2: " << p2.toInt() << " time: " << iTime;
+                                emit signalCommandFromServer({iCommand, p1, p2, iTime});
+                            }
+                        }
                     }
+
+
+
                 } else {
                     // have got core package flag
                     bool status;
@@ -135,6 +144,7 @@ void NetworkClient::readyRead()   {
                     emit signalPackageFromServer(package);
                 }
             }
+
         } else {
 
             // working with NA abonent
@@ -148,10 +158,10 @@ void NetworkClient::readyRead()   {
             * total: 24 bytes for default NA or TRIO command
             *
             * */
-            if(bufferRead.length() >= 24)   {
+            for(int byte = 0; byte < bufferRead.length(); byte+= 24)    {
                 bool status;
                 QByteArray header;
-                header = bufferRead.mid(0,8);
+                header = bufferRead.mid(byte,8);
                 int iSize = header.mid( 1, 1).toHex().toInt(&status, 16);
                 int iClientNode = header.mid( 3, 1).toHex().toInt(&status, 16);
                 int iNetworkFlag = header.mid( 4, 1).toHex().toInt(&status, 16);
@@ -163,12 +173,11 @@ void NetworkClient::readyRead()   {
                     qDebug() << "Have got package from client ID: " << iClientNode;
                 }
                 qDebug() << "Size = " << iSize << " FrameType = " << iFrameType;
-                qDebug() << socket->bytesAvailable();
 
                     // checking for default command
                 if(iSize == 24) {
                     QByteArray frame;
-                    frame = bufferRead.mid(0,24);
+                    frame = bufferRead.mid(byte,24);
                     frame.remove(0,8);
                     if(frame.length() >= 16)    {                   // checking if frame is correct
                         bool status;

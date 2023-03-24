@@ -106,5 +106,6 @@ private:
 
     bool bServerNode;
     bool multiScreen;
+
 };
 #endif // STR_H

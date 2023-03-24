@@ -152,15 +152,9 @@ STR::STR(QWidget *parent)
                 this,SLOT(setClientInformation(int)));
         connect(STR_server,SIGNAL(signalCommandFromClient(command_t)),
                 this,SLOT(slotReadCommand(command_t)));
-
-
-        /*
-         *  need to fix non complete synchronizing
-         *
-         *
         connect(STR_server,SIGNAL(signalNewClientConnected(QTcpSocket*)),
                 this, SLOT(slotNewClientConnected(QTcpSocket*)));
-        */
+
 
         for(int i = 0; i < object_manager->modelList.size(); i++) {
             ConnectModel(object_manager->modelList[i]);

@@ -139,15 +139,17 @@ void NetworkServer::readyRead() {
 
     if( socket->state() == QAbstractSocket::ConnectedState )    {
 
+        bufferRead.clear();
         bufferRead = socket->readAll();
 
-        //qDebug() << "Length: " << bufferRead.length();
+        qDebug() << "Length: " << bufferRead.length();
         //qDebug() << bufferRead;
 
-        if(bufferRead.length() >= 32)   {
+        for(int byte = 0; byte < bufferRead.length(); byte+= 32)    {
+
             bool status;
             QByteArray header;
-            header = bufferRead.mid(0,8);
+            header = bufferRead.mid(byte,8);
 
             qint32 iSize = header.mid( 1, 1).toHex().toInt(&status, 16);
             qint32 iMainNode = header.mid( 2, 1).toHex().toInt(&status, 16);
@@ -155,17 +157,19 @@ void NetworkServer::readyRead() {
             qint32 iNetworkFlag = header.mid( 4, 1).toHex().toInt(&status, 16);
             qint32 iFrameType = header.mid( 5, 1).toHex().toInt(&status, 16);
 
+            /*
             if(iNetworkFlag == 0)   {
                 qDebug() << "Have got message from server : " << iClientNode;
             } else {
                 qDebug() << "Have got message from client: " << iClientNode;
             }
+            */
             qDebug() << "Size = " << iSize << " FrameType = " << iFrameType;
 
                 // checking for default command
             if(iSize == 32) {
                 QByteArray frame;
-                frame = bufferRead.mid(0,32);
+                frame = bufferRead.mid(byte,32);
                 frame.remove(0,8);
 
                 if(frame.length() >= 24)    {                   // checking if frame is correct
@@ -181,8 +185,6 @@ void NetworkServer::readyRead() {
                     qDebug() << "Input command : " << iCommand << " " << p1.toInt() << " " << p2.toInt() << " " << iTime;
                     emit signalCommandFromClient({iCommand, p1, p1, iTime});
                 }
-            } else {
-                // try to unpack big package
             }
         }
     }

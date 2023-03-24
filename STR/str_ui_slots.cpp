@@ -87,5 +87,20 @@ void STR::on_action_eventmonitor_triggered()
 
 void STR::on_pushButtonContainer_2_clicked()
 {
-    sendCommandToNode(5,123,1,2);
+/*
+    for(int i = 0; i < 100; i++)    {
+        STR_server->addCommand({(uint)5000 + i,i,i,i});
+    }
+*/
+/*
+    for(int i = 0; i < core->commands.getEventCount(); i++) {
+        EventCommand e = core->commands.getEvent(i);
+        command_t command;
+        command.code = STR_COMMAND_ADD_EVENT;
+        command.par1 = e.code;
+        command.par2 = e.time;
+        command.time = timeNow();
+        STR_server->addCommandToClient(SSS,command);
+    }
+*/
 }

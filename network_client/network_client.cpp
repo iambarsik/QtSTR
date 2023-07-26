@@ -38,11 +38,13 @@ void NetworkClient::connectToServer()
         qDebug() << "System :: connecting ERROR";
         return;
     }
-    m_timer->start();
     bConnected = true;
+    reconnect_timer->stop();
+    m_timer->start();
     qDebug() << "Connected to Server";
     qDebug() << QString("System :: connected to server");
     sendMessage(network_command_type::com_init);
+    sendMessage(network_command_type::com_ping);
     emit clientConnected();
 }
 
@@ -128,6 +130,8 @@ void NetworkClient::readyRead()   {
                                 qDebug() << "Input command from STR : " << iCommand << " p1: " << p1.toInt() << " p2: " << p2.toInt() << " time: " << iTime;
                                 emit signalCommandFromServer({iCommand, p1, p2, iTime});
                             }
+
+                            bufferRead.remove(0,32);
                         }
                     }
 
@@ -139,7 +143,7 @@ void NetworkClient::readyRead()   {
                     QByteArray package = bufferRead;
                     package.remove(0,8); // delete header
                     int iPackageSize = package.mid(0,4).toHex().toInt(&status,16);
-                    qDebug() << "Package size = " << iPackageSize;
+                    //qDebug() << "Package size = " << iPackageSize;
                     package.remove(0,4); // delete 4 bytes about package size
                     emit signalPackageFromServer(package);
                 }

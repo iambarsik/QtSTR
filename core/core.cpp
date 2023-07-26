@@ -14,6 +14,8 @@ CoreQ::CoreQ():
     core_test_double2 = 0.0;
     core_test_double3 = 0.0;
     for(int i = 0; i < 1000; i++)  { core_test_arr[i] = 0; }
+
+    default_package_size = getPackage().size();
 }
 
 void CoreQ::pushInt(qint64 value)
@@ -72,11 +74,15 @@ QByteArray CoreQ::getPackage()
     // {
     // begin pack system
 
-    pushInt((int)str_system_start);
+    pushInt((qint64)str_system_start);
 
     // end pack system
     // }
-
+/*
+    for(int i = 0; i < 1000; i++)  {
+        pushInt(core_test_mass[i]);
+    }
+*/
     pushInt(core_test_var1);
     pushInt(core_test_var2);
     pushInt(core_test_var3);
@@ -98,6 +104,9 @@ QByteArray CoreQ::getPackage()
 
 void CoreQ::setCoreFromPackage(QByteArray package)
 {
+    if(package.size() < default_package_size)
+        return;
+
     QByteArray arr = package;
 
     // {
@@ -108,7 +117,11 @@ void CoreQ::setCoreFromPackage(QByteArray package)
 
     // end unpack system
     // }
-
+/*
+    for(int i = 0; i < 1000; i++)  {
+        popInt(arr,core_test_mass[i]);
+    }
+*/
     popInt(arr,core_test_var1);
     popInt(arr,core_test_var2);
     popInt(arr,core_test_var3);

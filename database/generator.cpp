@@ -9,30 +9,30 @@ void form::generateCore()
     QDir project_dir = QDir::currentPath() + "/" + sProjectDir;
     QDir core_dir = project_dir.path() + "/core";
 
-    qDebug() << project_dir.path();
-    qDebug() << core_dir.path();
+    //log(project_dir.path());
+    //log(core_dir.path());
 
     if(!project_dir.exists()) {
-        qDebug() << "GEN :: project directory is not exists...";
-        qDebug() << "GEN :: creating project directory...";
+        log("GEN :: project directory is not exists");
+        log("GEN :: creating project directory...");
         project_dir.setPath(QDir::currentPath());
         if(!project_dir.mkdir(sProjectDir)) {
-                qDebug() << "GEN :: cant create project directory " << project_dir.path() + "/" + sProjectDir;
+                log(QString("GEN :: cant create project directory %1/%2").arg(project_dir.path()).arg(sProjectDir));
                 return;
         }
         project_dir.setPath(QDir::currentPath() + "/" + sProjectDir);
-        qDebug() << "GEN :: project in " << project_dir.path() + "/" + sProjectDir << "is createed...";
+        log(QString("GEN :: project in %1 is created").arg(project_dir.path() + "/" + sProjectDir));
     }
     if(!core_dir.exists()) {
-        qDebug() << "GEN :: core directory is not exists...";
-        qDebug() << "GEN :: creating core directory...";
+        log("GEN :: core directory is not exists");
+        log("GEN :: creating core directory...");
         core_dir.setPath(project_dir.path());
         if(!core_dir.mkdir("core")) {
-                qDebug() << "GEN :: cant create core directory " << core_dir.path() + "/core";
+                log(QString("GEN :: cant create core directory %1 /core").arg(core_dir.path()));
                 return;
         }
         core_dir.setPath(project_dir.path() + "/core");
-        qDebug() << "GEN :: core in " << core_dir.path() + "/core" << "is createed...";
+        log(QString("GEN :: core in %1 is created").arg(core_dir.path() + "/core"));
     }
     if(!QFile::exists(core_dir.path() + "/core.pro"))   {
             // copy new core files from template
@@ -42,7 +42,7 @@ void form::generateCore()
         !QFile::copy("../templates/core/core.cpp",core_dir.path() + "/core.cpp") ||
         !QFile::copy("../templates/core/commandsq.h",core_dir.path() + "/commandsq.h") ||
         !QFile::copy("../templates/core/commandsq.cpp",core_dir.path() + "/commandsq.cpp")) {
-            qDebug() << "GEN :: cant copy core files from template";
+            log("GEN :: cant copy core files from template");
             return;
         }
     }
@@ -71,6 +71,12 @@ void form::generateCore()
 
     QStringList COMMANDS;
     QStringList COMMANDS_CONSTRUCTOR;
+
+        // push manualy system commands (problem with rus text when copy from template)
+    COMMANDS_CONSTRUCTOR.append(QString(sDB_tag + " dependings.push_back({ STR_COMMAND_SET, 0, \"<:: Отработка НУ ::>\"});"));
+    COMMANDS_CONSTRUCTOR.append(QString(sDB_tag + " dependings.push_back({ STR_COMMAND_START, 0, \"<:: Пуск динамики ::>\"});"));
+    COMMANDS_CONSTRUCTOR.append(QString(sDB_tag + " dependings.push_back({ STR_COMMAND_STOP, 0, \"<:: Стоп динамики ::>\"});"));
+    COMMANDS_CONSTRUCTOR.append(QString(sDB_tag + " dependings.push_back({ STR_COMMAND_END, 0, \"<:: Окончание тренировки ::>\"});"));
 
     buff_list.clear();
     buff_list = getNamesListFromTable("commands");
@@ -172,7 +178,8 @@ void form::generateCore()
             line.clear();
         }
     } else {
-        qDebug() << "GEN :: cant open core.h files";
+        log("GEN :: cant open core.h files");
+        return;
     }
     fCode.close();
 
@@ -216,7 +223,7 @@ void form::generateCore()
             line.clear();
         }
     } else {
-        qDebug() << "GEN :: cant open core.cpp files";
+        log("GEN :: cant open core.cpp files");
     }
     fCode.close();
 
@@ -257,7 +264,7 @@ void form::generateCore()
             line.clear();
         }
     } else {
-        qDebug() << "GEN :: cant open commandsq.h files";
+        log("GEN :: cant open commandsq.h files");
     }
     fCode.close();
 
@@ -292,7 +299,7 @@ void form::generateCore()
             line.clear();
         }
     } else {
-        qDebug() << "GEN :: cant open commandsq.cpp files";
+        log("GEN :: cant open commandsq.cpp files");
     }
     fCode.close();
 
@@ -312,29 +319,7 @@ void form::generateCore()
 
     saveCodeToFile(generatedCode,fCode);
 
-
-
-
-
-
-
-    /*
-        for(int i = 0; i < generatedCode.size(); i++)    {
-            qDebug() << generatedCode[i];
-        }
-        for(int i = 0; i < MODELS.size(); i++)    {
-            qDebug() << MODELS[i];
-        }
-        for(int i = 0; i < VARS_GET.size(); i++)    {
-            qDebug() << VARS_GET[i];
-        }
-        for(int i = 0; i < VARS.size(); i++)    {
-            qDebug() << VARS[i];
-        }
-        for(int i = 0; i < VARS_SET.size(); i++)    {
-            qDebug() << VARS_SET[i];
-        }
-    */
+    log("GEN :: core is successfully generated");
 }
 
 void form::generateModels()
@@ -343,20 +328,20 @@ void form::generateModels()
     QDir models_dir = project_dir.path() + "/models";
 
     if(!project_dir.exists()) {
-        qDebug() << "GEN :: project directory is not exists...";
-        qDebug() << "GEN :: be sure that core generator had worked succesfuly...";
+        log("GEN :: project directory is not exists");
+        log("GEN :: be sure that core generator had worked succesfuly");
         return;
     }
     if(!models_dir.exists()) {
-        qDebug() << "GEN :: models directory is not exists...";
-        qDebug() << "GEN :: creating models directory...";
+        log("GEN :: models directory is not exists");
+        log("GEN :: creating models directory...");
         models_dir.setPath(project_dir.path());
         if(!models_dir.mkdir("models")) {
-                qDebug() << "GEN :: cant create models directory " << models_dir.path() + "/models";
+                log(QString("GEN :: cant create models directory %1/models").arg(models_dir.path()));
                 return;
         }
         models_dir.setPath(project_dir.path() + "/models");
-        qDebug() << "GEN :: models directory in " << models_dir.path() << "is createed...";
+        log(QString("GEN :: models directory in %1 is created").arg(models_dir.path()));
     }
 
         // generating each model
@@ -367,15 +352,15 @@ void form::generateModels()
         QDir current_model_dir = models_dir.path() + "/" + mod;
 
         if(!current_model_dir.exists()) {
-            qDebug() << "GEN :: " << mod << " directory is not exists...";
-            qDebug() << "GEN :: creating model directory...";
+            log(QString("GEN :: %1 directory is not exists").arg(mod));
+            log("GEN :: creating model directory...");
             current_model_dir.setPath(models_dir.path());
             if(!current_model_dir.mkdir(mod)) {
-                    qDebug() << "GEN :: cant create " << current_model_dir.path();
+                    log(QString("GEN :: cant create %1").arg(current_model_dir.path()));
                     return;
             }
             current_model_dir.setPath(models_dir.path() + "/" + mod);
-            qDebug() << "GEN :: " << mod << " is createed...";
+            log(QString("GEN :: %1 is created").arg(mod));
         }
         if(!QFile::exists(current_model_dir.path() + "/" + mod + ".pro"))   {
                 // copy new model files from template
@@ -383,7 +368,7 @@ void form::generateModels()
             !QFile::copy("../templates/model/m_template.pro",current_model_dir.path() + "/" + mod + ".pro") ||
             !QFile::copy("../templates/model/m_template.h",current_model_dir.path() + "/" + mod + ".h") ||
             !QFile::copy("../templates/model/m_template.cpp",current_model_dir.path() + "/" + mod + ".cpp")) {
-                qDebug() << "GEN :: cant copy model files for " + mod + " from template";
+                log(QString("GEN :: cant copy model files for %1  from template").arg(mod));
                 return;
             }
         }
@@ -469,7 +454,7 @@ void form::generateModels()
                 line.clear();
             }
         } else {
-            qDebug() << "GEN :: cant open " << mod << ".pro file";
+            log(QString("GEN :: cant open %1.pro file").arg(mod));
         }
         fCode.close();
 
@@ -503,7 +488,7 @@ void form::generateModels()
                 line.clear();
             }
         } else {
-            qDebug() << "GEN :: cant open " << mod << ".h file";
+            log(QString("GEN :: cant open %1.h file").arg(mod));
         }
         fCode.close();
 
@@ -549,7 +534,8 @@ void form::generateModels()
                 line.clear();
             }
         } else {
-            qDebug() << "GEN :: cant open " << mod << ".cpp file";
+
+            log(QString("GEN :: cant open %1.cpp file").arg(mod));
         }
         fCode.close();
 
@@ -637,7 +623,8 @@ void form::generateModels()
             }
         }
         saveCodeToFile(generatedCode,fCode);
-    }    
+    }
+    log("GEN :: models are successfully generated");
 }
 
 void form::generateFormats()
@@ -646,20 +633,20 @@ void form::generateFormats()
     QDir formats_dir = project_dir.path() + "/formats";
 
     if(!project_dir.exists()) {
-        qDebug() << "GEN :: project directory is not exists...";
-        qDebug() << "GEN :: be sure that core generator had worked succesfuly...";
+        log("GEN :: project directory is not exists");
+        log("GEN :: be sure that core generator had worked succesfuly");
         return;
     }
     if(!formats_dir.exists()) {
-        qDebug() << "GEN :: formats directory is not exists...";
-        qDebug() << "GEN :: creating formats directory...";
+        log("GEN :: formats directory is not exists");
+        log("GEN :: creating formats directory...");
         formats_dir.setPath(project_dir.path());
         if(!formats_dir.mkdir("formats")) {
-                qDebug() << "GEN :: cant create formats directory " << formats_dir.path() + "/formats";
+                log(QString("GEN :: cant create formats directory %1/formats").arg(formats_dir.path()));
                 return;
         }
         formats_dir.setPath(project_dir.path() + "/formats");
-        qDebug() << "GEN :: formats directory in " << formats_dir.path() << "is createed...";
+        log(QString("GEN :: formats directory in %1 is createed").arg(formats_dir.path()));
     }
 
         // generating each format
@@ -670,15 +657,15 @@ void form::generateFormats()
         QDir current_format_dir = formats_dir.path() + "/" + form;
 
         if(!current_format_dir.exists()) {
-            qDebug() << "GEN :: " << form << " directory is not exists...";
-            qDebug() << "GEN :: creating model directory...";
+            log(QString("GEN :: %1 directory is not exists").arg(form));
+            log("GEN :: creating model directory...");
             current_format_dir.setPath(formats_dir.path());
             if(!current_format_dir.mkdir(form)) {
-                    qDebug() << "GEN :: cant create " << current_format_dir.path();
+                    log(QString("GEN :: cant create %1").arg(current_format_dir.path()));
                     return;
             }
             current_format_dir.setPath(formats_dir.path() + "/" + form);
-            qDebug() << "GEN :: " << form << " is createed...";
+            log(QString("GEN :: %1 is createed").arg(form));
         }
         if(!QFile::exists(current_format_dir.path() + "/" + form + ".pro"))   {
                 // copy new model files from template
@@ -687,7 +674,7 @@ void form::generateFormats()
             !QFile::copy("../templates/format/f_template.h",current_format_dir.path() + "/" + form + ".h") ||
             !QFile::copy("../templates/format/f_template.cpp",current_format_dir.path() + "/" + form + ".cpp") ||
             !QFile::copy("../templates/format/f_template.ui",current_format_dir.path() + "/" + form + ".ui")) {
-                qDebug() << "GEN :: cant copy format files for " + form + " from template";
+                log(QString("GEN :: cant copy format files for %1  from template").arg(form));
                 return;
             }
         }
@@ -716,7 +703,7 @@ void form::generateFormats()
                 line.clear();
             }
         } else {
-            qDebug() << "GEN :: cant open " << form << ".pro file";
+            log(QString("GEN :: cant open %1.pro file").arg(form));
         }
         fCode.close();
 
@@ -757,7 +744,7 @@ void form::generateFormats()
                 line.clear();
             }
         } else {
-            qDebug() << "GEN :: cant open " << form << ".h file";
+            log(QString("GEN :: cant open %1.h file").arg(form));
         }
         fCode.close();
 
@@ -797,7 +784,7 @@ void form::generateFormats()
                 line.clear();
             }
         } else {
-            qDebug() << "GEN :: cant open " << form << ".cpp file";
+            log(QString("GEN :: cant open %1.cpp file").arg(form));
         }
         fCode.close();
 
@@ -852,7 +839,7 @@ void form::generateFormats()
                 line.clear();
             }
         } else {
-            qDebug() << "GEN :: cant open " << form << ".ui file";
+            log(QString("GEN :: cant open %1.ui file").arg(form));
         }
         fCode.close();
 
@@ -886,6 +873,7 @@ void form::generateFormats()
         saveCodeToFile(generatedCode,fCode);
 
     }
+    log("GEN :: formats are successfully generated");
 }
 
 void form::generateManager()
@@ -894,20 +882,20 @@ void form::generateManager()
     QDir manager_dir = project_dir.path() + "/manager";
 
     if(!project_dir.exists()) {
-        qDebug() << "GEN :: project directory is not exists...";
-        qDebug() << "GEN :: be sure that core generator had worked succesfuly...";
+        log("GEN :: project directory is not exists");
+        log("GEN :: be sure that core generator had worked succesfuly");
         return;
     }
     if(!manager_dir.exists()) {
-        qDebug() << "GEN :: manager directory is not exists...";
-        qDebug() << "GEN :: creating manager directory...";
+        log("GEN :: manager directory is not exists...");
+        log("GEN :: creating manager directory...");
         manager_dir.setPath(project_dir.path());
         if(!manager_dir.mkdir("manager")) {
-                qDebug() << "GEN :: cant create manager directory " << manager_dir.path() + "/manager";
+                log(QString("GEN :: cant create manager directory %1/manager").arg(manager_dir.path()));
                 return;
         }
         manager_dir.setPath(project_dir.path() + "/manager");
-        qDebug() << "GEN :: manager directory in " << manager_dir.path() << "is createed...";
+        log(QString("GEN :: manager directory in %1 is createed...").arg(manager_dir.path()));
     }
     if(!QFile::exists(manager_dir.path() + "/manager.pro"))   {
             // copy new manager files from template
@@ -917,7 +905,7 @@ void form::generateManager()
         !QFile::copy("../templates/manager/modules.h",manager_dir.path() + "/modules.h") ||
         !QFile::copy("../templates/manager/manager.h",manager_dir.path() + "/manager.h") ||
         !QFile::copy("../templates/manager/manager.cpp",manager_dir.path() + "/manager.cpp")) {
-            qDebug() << "GEN :: cant copy manager files from template";
+            log("GEN :: cant copy manager files from template");
             return;
         }
     }
@@ -1003,7 +991,7 @@ void form::generateManager()
             line.clear();
         }
     } else {
-        qDebug() << "GEN :: cant open manager.h files";
+        log("GEN :: cant open manager.h files");
     }
     fCode.close();
 
@@ -1038,7 +1026,7 @@ void form::generateManager()
             line.clear();
         }
     } else {
-        qDebug() << "GEN :: cant open modules.h files";
+        log("GEN :: cant open modules.h files");
     }
     fCode.close();
 
@@ -1079,7 +1067,7 @@ void form::generateManager()
             line.clear();
         }
     } else {
-        qDebug() << "GEN :: cant open manager.cpp files";
+        log("GEN :: cant open manager.cpp files");
     }
     fCode.close();
 
@@ -1124,17 +1112,96 @@ void form::generateManager()
     saveCodeToFile(generatedCode,fCode);
 
 
+    log("GEN :: module manager is successfully generated");
+}
 
+void form::generateGlobalProject()
+{
+    QDir project_dir = QDir::currentPath() + "/" + sProjectDir;
+    if(!project_dir.exists()) {
+        log("GEN :: project directory is not exists");
+        log("GEN :: cant create global project file");
+        return;
+    }
+    if(QFile::exists(project_dir.path() + "/GLOBAL_PROJECT.pro"))   {
+        log("GEN :: generating new global project file...");
+        if(!QFile::remove(project_dir.path() + "/GLOBAL_PROJECT.pro"))   {
+                log("GEN :: cant remove old global project file");
+                return;
+        }
+    }
 
+    if(!QFile::copy("../templates/GLOBAL_PROJECT.pro",project_dir.path() + "/GLOBAL_PROJECT.pro"))    {
+        log("GEN :: cant copy global project file from template");
+        return;
+    }
 
+    QFile fCode;
+    QStringList originalCode;
+    QStringList cleanCode;
+    QStringList generatedCode;
 
+    QStringList buff_list;
 
+    buff_list.clear();
+    buff_list = getNamesListFromTable("models");
 
+    QStringList MODELS;
+    for(int i = 0; i < buff_list.size(); i++) {
+        if(i < buff_list.size() - 1)
+            MODELS.append("\t\tmodels/" + buff_list[i] + " \\");
+        else
+            MODELS.append("\t\tmodels/" + buff_list[i]);
+    }
 
+    buff_list.clear();
+    buff_list = getNamesListFromTable("formats");
 
+    QStringList FORMATS;
+    for(int i = 0; i < buff_list.size(); i++) {
+        if(i < buff_list.size() - 1)
+            FORMATS.append("\t\tSUBDIRS += formats/" + buff_list[i] + " \\");
+        else
+            FORMATS.append("\t\tSUBDIRS += formats/" + buff_list[i]);
+    }
+    originalCode.clear();
+    cleanCode.clear();
+    generatedCode.clear();
+    fCode.setFileName(project_dir.path() + "/GLOBAL_PROJECT.pro");
+    if(fCode.open(QFile::ReadOnly)) {
+        QTextStream out(&fCode);
+        QString line;
+        originalCode.clear();
+        while (out.readLineInto(&line)) {
+            originalCode.append(line);
+            line.clear();
+        }
+    } else {
+        log("GEN :: cant open GLOBAL_PROJECT.pro");
+        return;
+    }
+    fCode.close();
 
+    for(int i = 0; i < originalCode.size(); i++)    {
+        if(originalCode[i].contains(sDB_tag))  {
+            continue;
+        }
+        cleanCode.append(originalCode[i]);
+    }
 
+    for(int i = 0; i < cleanCode.size(); i++)    {
+        generatedCode.append(cleanCode[i]);
+        if(cleanCode[i].contains("<MODELS>"))  {
+            generatedCode.append(MODELS);
+        }
+        if(cleanCode[i].contains("<FORMATS>"))  {
+            generatedCode.append(FORMATS);
+        }
+    }
 
+    saveCodeToFile(generatedCode,fCode);
+
+    log("GEN :: global project is successfully generated");
 }
 
 void form::saveCodeToFile(const QStringList code, QFile &file)

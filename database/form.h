@@ -54,6 +54,8 @@ private slots:
     void slotUpdateVariable(variable_struct var);
     void slotSQLrequest(QString execute);
 
+    void log(QString message);
+
     void on_bAdd_clicked();
 
     void on_listWidget_itemClicked(QListWidgetItem *item);
@@ -96,10 +98,13 @@ private:
     QString sProjectDir;
     QString sDB_tag;
 
+    QString m_log_name;
+
     void generateCore();
     void generateModels();
     void generateFormats();
     void generateManager();
+    void generateGlobalProject();
     void saveCodeToFile(const QStringList code, QFile &file);
 };
 #endif // FORM_H

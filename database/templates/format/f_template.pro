@@ -29,8 +29,8 @@ DESTDIR = $${BIN_PATH}/
 
 INCLUDEPATH += $$PWD/../../core
 DEPENDPATH += $$PWD/../../core
-win32: LIBS += -L$$PWD/../../_output/ -lCore
+LIBS += -L$$PWD/../../_output/ -lCore
 
 INCLUDEPATH += $$PWD/../../templates/format
 DEPENDPATH += $$PWD/../../templates/format
-win32: LIBS += -L$$PWD/../../_output/ -lformat
+LIBS += -L$$PWD/../../_output/ -lformat

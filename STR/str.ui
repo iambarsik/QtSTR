@@ -79,7 +79,7 @@
    <widget class="QPushButton" name="pushButtonContainer">
     <property name="geometry">
      <rect>
-      <x>630</x>
+      <x>590</x>
       <y>2</y>
       <width>161</width>
       <height>31</height>
@@ -149,7 +149,7 @@
      </font>
     </property>
     <property name="text">
-     <string>ТЕСТОВАЯ КНОПКА</string>
+     <string>Параметры тренировки</string>
     </property>
    </widget>
   </widget>

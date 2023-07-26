@@ -262,3 +262,17 @@ void form::slotSQLrequest(QString execute)
     }
     this->on_comboBox_tables_activated(ui->comboBox_tables->currentIndex());
 }
+
+void form::log(QString message)
+{
+    qDebug() << message;
+    QString filename = QDir::currentPath() + "/log/" + m_log_name;
+    QFile file(m_log_name);
+    file.open(QIODevice::Append);
+    QTextStream out(&file);
+    out.setCodec(QTextCodec::codecForName("UTF-8"));
+    QString st = QTime::currentTime().toString();
+    out << QString("%1 : %2").arg(st).arg(message) << "\n";
+
+    file.close();
+}

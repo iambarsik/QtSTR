@@ -41,7 +41,16 @@ void F_TEST::on_pushButton_clicked()
 
 void F_TEST::on_pushButton_2_clicked()
 {
-    sendCommandToModel(core->commands.test_command7,
-                       STR_PARAM(ui->ep1->text().toDouble()),
-                       STR_PARAM(ui->ep2->text().toDouble()), 0);
+    int commm = ui->ep1->text().toInt();
+    switch(commm)   {
+        case 1:sendCommandToModel(core->commands.test_command1, STR_PARAM(ui->ep1->text().toDouble()), STR_PARAM(ui->ep2->text().toDouble()), 0); break;
+        case 2:sendCommandToModel(core->commands.test_command2, STR_PARAM(ui->ep1->text().toDouble()), STR_PARAM(ui->ep2->text().toDouble()), 0); break;
+        case 3:sendCommandToModel(core->commands.test_command3, STR_PARAM(ui->ep1->text().toDouble()), STR_PARAM(ui->ep2->text().toDouble()), 0); break;
+        case 4:sendCommandToModel(core->commands.test_command4, STR_PARAM(ui->ep1->text().toDouble()), STR_PARAM(ui->ep2->text().toDouble()), 0); break;
+        case 5:sendCommandToModel(core->commands.test_command5, STR_PARAM(ui->ep1->text().toDouble()), STR_PARAM(ui->ep2->text().toDouble()), 0); break;
+        case 6:sendCommandToModel(core->commands.test_command6, STR_PARAM(ui->ep1->text().toDouble()), STR_PARAM(ui->ep2->text().toDouble()), 0); break;
+        case 7:sendCommandToModel(core->commands.test_command7, STR_PARAM(ui->ep1->text().toDouble()), STR_PARAM(ui->ep2->text().toDouble()), 0); break;
+        default:sendCommandToModel(core->commands.test_command1,STR_PARAM(ui->ep1->text().toDouble()), STR_PARAM(ui->ep2->text().toDouble()), 0);
+    }
+
 }

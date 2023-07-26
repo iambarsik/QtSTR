@@ -2,10 +2,6 @@
 
 CommandsQ::CommandsQ()
 {
-    dependings.push_back({ STR_COMMAND_SET, 0, "<:: Отработка НУ ::>"});
-    dependings.push_back({ STR_COMMAND_START, 0, "<:: Пуск динамики ::>"});
-    dependings.push_back({ STR_COMMAND_STOP, 0, "<:: Стоп динамики ::>"});
-    dependings.push_back({ STR_COMMAND_END, 0, "<:: Окончание тренировки ::>"});
 //<CONSTRUCTOR_SECTION>	
 //</CONSTRUCTOR_SECTION>
 }
@@ -26,6 +22,15 @@ uint CommandsQ::getModelOwner(uint command_code)    {
         }
     }
     return 0;
+}
+
+EventCommand CommandsQ::getEvent(int num)
+{
+    if(num > - 1 && num < events.size()) {
+        return events[num];
+    }
+    const uint com = 0;
+    return {com,0};
 }
 
 void CommandsQ::addEvent(uint command, qint32 time)  {

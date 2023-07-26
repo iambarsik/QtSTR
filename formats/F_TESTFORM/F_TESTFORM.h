@@ -10,6 +10,9 @@
 #include "../../core/core.h"
 #include "../../include/common.h"
 
+#include <QPaintEvent>
+#include <QPainter>
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class F_TESTFORM; }
 QT_END_NAMESPACE
@@ -29,8 +32,7 @@ signals:
 
 
 private slots:
-    void on_pushButton_clicked();
-    void on_pushButton_2_clicked();
+    void paintEvent(QPaintEvent * event) override;
 
 private:
     Ui::F_TESTFORM *ui;

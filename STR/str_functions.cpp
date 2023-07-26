@@ -6,6 +6,10 @@ void STR::ConnectModel(ModelQ *model)
     connect(this,&STR::set,model,&ModelQ::set);
     connect(this,&STR::start,model,&ModelQ::start);
     connect(this,&STR::stop,model,&ModelQ::stop);
+    connect(model,SIGNAL(signalCommandToNodeSended(uint,command_na)),
+            this,SLOT(sendCommandToNode(uint,command_na)));
+    connect(model,SIGNAL(signalCommandSended(command_t)),
+            this,SLOT(slotReadCommand(command_t)));
 }
 
 void STR::ConnectFormat(FormatQ *format)
@@ -148,12 +152,12 @@ void STR::updateNetworkState()
     }
 }
 
-void STR::sendCommandToNode(qint32 nodeId, uint command, qint32 par1, qint32 par2)
+void STR::sendCommandToNode(uint nodeId, command_na com)
 {
     if(bServerNode) {
         for(int i = 0; i < NA_client.size(); i++)   {
-            if(NA_client[i]->getID() == nodeId) {
-                NA_client[i]->addCommandForNA(command, par1, par2);
+            if(NA_client[i]->getID() == (qint32)nodeId) {
+                NA_client[i]->addCommandForNA(com.code, com.par1, com.par2);
                 break;
             }
         }

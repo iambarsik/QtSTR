@@ -17,6 +17,8 @@ class Q_DECL_EXPORT CoreQ : public QObject
 public:
     CoreQ();
 
+    qint64 default_package_size;
+
     CommandsQ commands;
 
     void pushInt(qint64 value);
@@ -37,6 +39,8 @@ public slots:
 
 public:
 
+    qint64 get_test_mass(int position) { if(position < 1000) return core_test_mass[position]; else return -666; }
+
     qint64 get_test_var1() { return core_test_var1; }
     qint64 get_test_var2() { return core_test_var2; }
     qint64 get_test_var3() { return core_test_var3; }
@@ -56,6 +60,8 @@ private:
 
     bool str_system_start;
     QByteArray m_package;
+
+    qint64 core_test_mass[1000]; void set_test_mass(qint64 value, int position) { if(position < 1000) core_test_mass[position] = value; }
 
     qint64 core_test_var1; void set_test_var1(qint64 test_var1) { core_test_var1 = test_var1; }
     qint64 core_test_var2; void set_test_var2(qint64 test_var2) { core_test_var2 = test_var2; }

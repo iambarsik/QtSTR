@@ -71,7 +71,7 @@ public slots:
     void slotOpenFormat(STRformat_enum name);
     void updateNetworkState();
 
-    void sendCommandToNode(qint32 nodeId, uint command, qint32 par1, qint32 par2);
+    void sendCommandToNode(uint nodeId, command_na com);
 
 private slots:
     void on_pushButtonSet_clicked();

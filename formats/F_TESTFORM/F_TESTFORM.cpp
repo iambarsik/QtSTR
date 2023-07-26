@@ -15,33 +15,26 @@ F_TESTFORM::~F_TESTFORM()
 
 void F_TESTFORM::update()
 {
-    ui->textEdit->clear();
-    ui->textEdit->append(QString("another var1 = %1").arg(core->get_test_var1()));
-    ui->textEdit->append(QString("another var2 = %1").arg(core->get_test_var2()));
-    ui->textEdit->append(QString("another var3 = %1").arg(core->get_test_var3()));
-    ui->textEdit->append(QString("another var4 = %1").arg(core->get_test_var4()));
-    ui->textEdit->append(QString("another var5 = %1").arg(core->get_test_var5()));
-    ui->textEdit->append(QString("another var6 = %1").arg(core->get_test_var6()));
-    ui->textEdit->append(QString("another var7 = %1").arg(core->get_test_var7()));
-    ui->textEdit->append(QString("another arr995 = %1").arg(core->get_test_arr(995)));
-    ui->textEdit->append(QString("another arr996 = %1").arg(core->get_test_arr(996)));
-    ui->textEdit->append(QString("another arr997 = %1").arg(core->get_test_arr(997)));
-    ui->textEdit->append(QString("another arr998 = %1").arg(core->get_test_arr(998)));
-    ui->textEdit->append(QString("another arr999 = %1").arg(core->get_test_arr(999)));
-    ui->textEdit->append(QString("another double1 = %1").arg(core->get_test_double1()));
-    ui->textEdit->append(QString("another double2 = %1").arg(core->get_test_double2()));
-    ui->textEdit->append(QString("another double3 = %1").arg(core->get_test_double3()));
+
+    repaint();
 }
 
-
-void F_TESTFORM::on_pushButton_clicked()
+void F_TESTFORM::paintEvent(QPaintEvent *event)
 {
-    ui->textEdit->append(QString("test_var1 = %1").arg(core->get_test_var1()));
-}
+    Q_UNUSED(event);
+    QPainter p(this);
+    p.setBrush(QBrush(Qt::black));
+    p.drawRect(0,0,this->width(),this->height());
 
-void F_TESTFORM::on_pushButton_2_clicked()
-{
+    p.setPen(QPen(Qt::green));
+    p.setFont(QFont("Arial",12));
+    p.drawText(10,14*1,QString("%1").arg(core->get_test_double1()));
+    p.drawText(10,14*2,QString("%1").arg(core->get_test_double2()));
+    p.drawText(10,14*3,QString("%1").arg(core->get_test_double3()));
+
+    /*
     sendCommandToModel(core->commands.test_command7,
-                       STR_PARAM(ui->ep1->text().toDouble()),
-                       STR_PARAM(ui->ep2->text().toDouble()), 0);
+                       STR_PARAM(0.0),
+                       STR_PARAM(0.0), 0);
+    */
 }

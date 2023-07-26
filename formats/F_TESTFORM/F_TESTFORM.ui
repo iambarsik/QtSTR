@@ -19,62 +19,6 @@
   <property name="windowTitle">
    <string>F_TESTFORM</string>
   </property>
-  <widget class="QPushButton" name="pushButton">
-   <property name="geometry">
-    <rect>
-     <x>150</x>
-     <y>340</y>
-     <width>141</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Добавить текст</string>
-   </property>
-  </widget>
-  <widget class="QTextEdit" name="textEdit">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>10</y>
-     <width>281</width>
-     <height>321</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pushButton_2">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>400</y>
-     <width>141</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Отправить команду</string>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="ep1">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>340</y>
-     <width>91</width>
-     <height>20</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="ep2">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>370</y>
-     <width>91</width>
-     <height>20</height>
-    </rect>
-   </property>
-  </widget>
  </widget>
  <resources/>
  <connections/>

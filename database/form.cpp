@@ -9,12 +9,17 @@ form::form(QWidget *parent)
 {
     ui->setupUi(this);
 
+    QDate log_date = QDate::currentDate();
+    m_log_name = QString("log_%1-%2-%3").arg(log_date.day()).arg(log_date.month()).arg(log_date.year());
+    log("================================================");
+
     sProjectDir = "generated_data";
+
     sDB_tag = "/*<::db_generated::>*/";
 
     QString sDB_NAME = "./database.db";
 
-    db = QSqlDatabase::addDatabase(("QSQLITE"));
+    db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName(sDB_NAME);
 
     bool bCreateDB = false;
@@ -24,18 +29,19 @@ form::form(QWidget *parent)
 
     if(db.open())    {
         if(bCreateDB == true)   {
-            qDebug() << "SYS :: can't open database...";
-            qDebug() << "SYS :: creating database manualy...";
+            log("SYS :: can't open database...");
+            log("SYS :: creating database manualy...");
             try {
                 createDB();
-                qDebug() << "SYS :: database is created...";
+                log("SYS :: database is created...");
             } catch(QException *e) {
-                qDebug() << e->what();
+                log(e->what());
             }
         }
     } else {
-
-        qDebug() << "SYS :: opening DB error";
+        log("SYS :: opening DB error");
+        QMessageBox::warning(this,"ОШИБКА","Невозможно открыть базу данных",QMessageBox::Ok);
+        QApplication::exit(-1);
     }
     m_query = new QSqlQuery(db);
 
@@ -77,6 +83,8 @@ form::form(QWidget *parent)
     connect(&sqlForm,SIGNAL(signalSQLrequest(QString)),this,SLOT(slotSQLrequest(QString)));
 
     this->on_comboBox_tables_activated(ui->comboBox_tables->currentIndex());
+
+    this->setWindowIcon(QIcon(":/images/ico.ico"));
 }
 
 form::~form()
@@ -294,7 +302,7 @@ void form::on_bRemove_clicked()
     sExecute = "DELETE FROM " + sTable + " WHERE name = '" + sName + "'";
     QSharedPointer<QSqlQuery> q = QSharedPointer<QSqlQuery>(new QSqlQuery(db));
     if(!q->exec(sExecute))  {
-        qDebug() << "Error deleting from table";
+        log("Error deleting from table");
     }
     this->on_comboBox_tables_activated(ui->comboBox_tables->currentIndex());
     ui->widgetInfo->setVisible(false);
@@ -410,7 +418,10 @@ void form::on_action_generate_triggered()
         generateModels();
         generateFormats();
         generateManager();
+        generateGlobalProject();
     } catch (QException *e) {
-        qDebug() << e->what();
+        log(e->what());
     }
+
+    QMessageBox::warning(this,"Сообщение","Генерация исходных кодов завершена",QMessageBox::Ok);
 }

@@ -26,14 +26,14 @@ DESTDIR = $${BIN_PATH}/
 
 INCLUDEPATH += $$PWD/../core
 DEPENDPATH += $$PWD/../core
-win32: LIBS += -L$$PWD/../_output/ -lCore
+LIBS += -L$$PWD/../_output/ -lCore
 
 INCLUDEPATH += $$PWD/../templates/model
 DEPENDPATH += $$PWD/../templates/model
-win32: LIBS += -L$$PWD/../_output/ -lmodel
+LIBS += -L$$PWD/../_output/ -lmodel
 
 INCLUDEPATH += $$PWD/../templates/format
 DEPENDPATH += $$PWD/../templates/format
-win32: LIBS += -L$$PWD/../_output/ -lformat
+LIBS += -L$$PWD/../_output/ -lformat
 
 include($${_PRO_FILE_PWD_}/modules.pri)

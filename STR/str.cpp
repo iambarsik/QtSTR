@@ -204,9 +204,9 @@ STR::STR(QWidget *parent)
 
     this->setWindowIcon(QIcon(":/images/ico.ico"));
 
-    on_action_networkstate_triggered();
-    on_action_container_triggered();
-    on_action_eventmonitor_triggered();
+    //on_action_networkstate_triggered();
+    //on_action_container_triggered();
+    //on_action_eventmonitor_triggered();
 }
 
 STR::~STR()

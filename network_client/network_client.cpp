@@ -93,7 +93,7 @@ void NetworkClient::readyRead()   {
 
                     for(int byte = 0; byte < bufferRead.length(); byte+= 32)    {
 
-                        qDebug() << bufferRead.length();
+                        //qDebug() << bufferRead.length();
 
                         QByteArray header;
                         header = bufferRead.mid(byte,8);
@@ -103,6 +103,11 @@ void NetworkClient::readyRead()   {
                         int iNetworkFlag = header.mid( 4, 1).toHex().toInt(&status, 16);
                         int iFrameType = header.mid( 5, 1).toHex().toInt(&status, 16);
 
+                        Q_UNUSED(iSize);
+                        Q_UNUSED(iClientNode);
+                        Q_UNUSED(iNetworkFlag);
+                        Q_UNUSED(iFrameType);
+
                         /*
                         if(iNetworkFlag == 0)   {
                             qDebug() << "Have got message from server ID: " << iClientNode;
@@ -110,7 +115,7 @@ void NetworkClient::readyRead()   {
                             qDebug() << "Have got message from client ID: " << iClientNode;
                         }
                         */
-                        qDebug() << "Size = " << iSize << " FrameType = " << iFrameType;
+                        //qDebug() << "Size = " << iSize << " FrameType = " << iFrameType;
 
                             // checking for default command
                         if(iSize == 32) {
@@ -129,10 +134,14 @@ void NetworkClient::readyRead()   {
 
                                 qDebug() << "Input command from STR : " << iCommand << " p1: " << p1.toInt() << " p2: " << p2.toInt() << " time: " << iTime;
                                 emit signalCommandFromServer({iCommand, p1, p2, iTime});
+                            }else {
+                                qDebug() << "wrong frame size " << frame.length();
                             }
-
-                            bufferRead.remove(0,32);
+                        } else {
+                            qDebug() << "wrong pack size " << iSize;
+                            bufferRead.remove(0,iSize);
                         }
+                        //bufferRead.remove(0,iSize);
                     }
 
 
@@ -145,6 +154,7 @@ void NetworkClient::readyRead()   {
                     int iPackageSize = package.mid(0,4).toHex().toInt(&status,16);
                     //qDebug() << "Package size = " << iPackageSize;
                     package.remove(0,4); // delete 4 bytes about package size
+                    bufferRead.remove(0,8 + 4 + iPackageSize);
                     emit signalPackageFromServer(package);
                 }
             }
@@ -236,8 +246,8 @@ void NetworkClient::sendMessage(network_command_type type)   {
 
                     dataSend.append((char) 0x00);
                     dataSend.append((char) 13 + Node.name.size());
-                    dataSend.append((char) Node.mainNode);
                     dataSend.append((char) Node.ID);
+                    dataSend.append((char) Node.mainNode);
                     dataSend.append((char) 0x01);
                     dataSend.append((char) Node.frameType);
                     dataSend.append((char) 0x00);
@@ -269,8 +279,8 @@ void NetworkClient::sendMessage(network_command_type type)   {
             // 8 байт - заголовок кадра
             dataSend.append((char) 0x00);           // 1 байт - 0
             dataSend.append((char) 0x08);           // 2 байт - текущая длинна кадра в байтах (включая размер заголовка)
-            dataSend.append((char) Node.mainNode);  // 3 байт - идентификатор получателя
-            dataSend.append((char) Node.ID);        // 4 байт - идентификатор отправителя (номер узла)
+            dataSend.append((char) Node.ID);  		// 3 байт - идентификатор получателя
+            dataSend.append((char) Node.mainNode);  // 4 байт - идентификатор отправителя (номер узла)
             dataSend.append((char) 0x01);           // 5 байт - флаг кадра ( 0 - я сервер, 1 - я клинет )
             dataSend.append((char) Node.frameType); // 6 байт - тип кадра
             dataSend.append((char) 0x00);           // 7 байт - зарезервировано
@@ -284,8 +294,8 @@ void NetworkClient::sendMessage(network_command_type type)   {
                 // 8 байт - заголовок кадра
             dataSend.append((char) 0x00);                       // 1 байт - 0
             dataSend.append((char) 8 + bufferSend.size() + 4);  // 2 байт - текущая длинна кадра в байтах (размер заголовка + size + time)
-            dataSend.append((char) Node.mainNode);              // 3 байт - идентификатор получателя
-            dataSend.append((char) Node.ID);                    // 4 байт - идентификатор отправителя (номер узла)
+            dataSend.append((char) Node.ID);              		// 3 байт - идентификатор получателя
+            dataSend.append((char) Node.mainNode);              // 4 байт - идентификатор отправителя (номер узла)
             dataSend.append((char) 0x01);                       // 5 байт - флаг кадра ( 0 - я сервер, 1 - я клинет )
             dataSend.append((char) Node.frameType);             // 6 байт - тип кадра
             dataSend.append((char) 0x00);                       // 7 байт - зарезервировано
@@ -315,8 +325,8 @@ void NetworkClient::sendMessage(network_command_type type)   {
                 // 8 байт - заголовок кадра
             dataSend.append((char) 0x00);                       // 1 байт - 0
             dataSend.append((char) 8 + bufferSend.size() + 4);  // 2 байт - текущая длинна кадра в байтах (размер заголовка + size + time)
-            dataSend.append((char) Node.mainNode);              // 3 байт - идентификатор получателя
-            dataSend.append((char) Node.ID);                    // 4 байт - идентификатор отправителя (номер узла)
+            dataSend.append((char) Node.ID);              		// 3 байт - идентификатор получателя
+            dataSend.append((char) Node.mainNode);              // 4 байт - идентификатор отправителя (номер узла)
             dataSend.append((char) 0x01);                       // 5 байт - флаг кадра ( 0 - я сервер, 1 - я клинет )
             dataSend.append((char) Node.frameType);             // 6 байт - тип кадра
             dataSend.append((char) 0x00);                       // 7 байт - зарезервировано

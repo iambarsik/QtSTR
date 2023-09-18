@@ -183,7 +183,7 @@ void NetworkServer::readyRead() {
                     bufferRead.remove(0, 32);                   // delete frame from buffer
 
                     qDebug() << "Input command : " << iCommand << " " << p1.toInt() << " " << p2.toInt() << " " << iTime;
-                    emit signalCommandFromClient({iCommand, p1, p1, iTime});
+                    emit signalCommandFromClient({iCommand, p1, p2, iTime});
                 }
             }
         }
@@ -198,8 +198,8 @@ void NetworkServer::sendMessage(QTcpSocket* socket, network_command_type type)  
 
             byteArray.append((char) 0x00);
             byteArray.append((char) 13 + Node.name.size());
-            byteArray.append((char) Node.mainNode);
             byteArray.append((char) Node.ID);
+            byteArray.append((char) Node.mainNode);
             byteArray.append((char) 0x00);
             byteArray.append((char) Node.frameType);
             byteArray.append((char) 0x00);
@@ -224,8 +224,8 @@ void NetworkServer::sendMessage(QTcpSocket* socket, network_command_type type)  
             // 8 байт - заголовок кадра
             dataSend.append((char) 0x00);           // 1 байт - 0
             dataSend.append((char) 0x08);           // 2 байт - текущая длинна кадра в байтах (включая размер заголовка)
-            dataSend.append((char) Node.mainNode);  // 3 байт - идентификатор получателя
-            dataSend.append((char) Node.ID);        // 4 байт - идентификатор отправителя (номер узла)
+            dataSend.append((char) Node.ID);        // 3 байт - идентификатор получателя
+            dataSend.append((char) Node.mainNode);  // 4 байт - идентификатор отправителя (номер узла)
             dataSend.append((char) 0x00);           // 5 байт - флаг кадра ( 0 - я сервер, 1 - я клинет )
             dataSend.append((char) Node.frameType); // 6 байт - тип кадра
             dataSend.append((char) 0x00);           // 7 байт - зарезервировано
@@ -239,8 +239,8 @@ void NetworkServer::sendMessage(QTcpSocket* socket, network_command_type type)  
             // 8 байт - заголовок кадра
             dataSend.append((char) 0x00);                       // 1 байт - 0
             dataSend.append((char) 8 + bufferSend.size() + 4);  // 2 байт - текущая длинна кадра в байтах (размер заголовка + size + time)
-            dataSend.append((char) Node.mainNode);              // 3 байт - идентификатор получателя
-            dataSend.append((char) Node.ID);                    // 4 байт - идентификатор отправителя (номер узла)
+            dataSend.append((char) Node.ID);              		// 3 байт - идентификатор получателя
+            dataSend.append((char) Node.mainNode);              // 4 байт - идентификатор отправителя (номер узла)
             dataSend.append((char) 0x00);                       // 5 байт - флаг кадра ( 0 - я сервер, 1 - я клинет )
             dataSend.append((char) Node.frameType);             // 6 байт - тип кадра
             dataSend.append((char) 0x00);                       // 7 байт - зарезервировано

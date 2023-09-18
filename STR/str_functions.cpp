@@ -93,7 +93,7 @@ void STR::slotReadCommand(command_t command)
 
             break;
             case STR_COMMAND_ADD_EVENT:
-                    // adding to event monitor
+                    // adding to event monitor                 d
                 pushEvent(command.par1.toInt(), command.par2.toInt());
             break;
             default:
